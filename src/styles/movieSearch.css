@@ -1,0 +1,296 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
+
+:root {
+  --panel-bg: rgba(10, 12, 20, 0.72);
+  --panel-border: rgba(255, 255, 255, 0.12);
+  --text-main: #f5f7fb;
+  --text-muted: rgba(245, 247, 251, 0.72);
+  --accent: #7c5cff;
+  --accent-hover: #6746ff;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+  --bg-primary: #0b1020;
+  --bg-gradient: linear-gradient(180deg, rgba(7, 10, 18, 0.5), rgba(7, 10, 18, 0.9));
+}
+
+[data-theme="light"] {
+  --panel-bg: rgba(255, 255, 255, 0.85);
+  --panel-border: rgba(0, 0, 0, 0.1);
+  --text-main: #1a1a2e;
+  --text-muted: rgba(26, 26, 46, 0.7);
+  --accent: #6c5ce7;
+  --accent-hover: #5f3dc4;
+  --shadow: 0 24px 80px rgba(0, 0, 0, 0.15);
+  --bg-primary: #f8f9fa;
+  --bg-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(248, 249, 250, 0.6));
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Inter", sans-serif;
+  color: var(--text-main);
+  background-color: var(--bg-primary);
+  background-image:
+    var(--bg-gradient),
+    url("../assets/img/fondo.jpg");
+  background-size: auto, contain;
+  background-position: center, center top;
+  background-repeat: no-repeat;
+  background-attachment: scroll;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.container {
+  width: min(1120px, calc(100% - 32px));
+  margin: 48px auto;
+  padding: 28px;
+  border: 1px solid var(--panel-border);
+  border-radius: 28px;
+  background: var(--panel-bg);
+  backdrop-filter: blur(18px);
+  box-shadow: var(--shadow);
+  position: relative;
+}
+
+.title,
+h1 {
+  margin: 0 0 24px;
+  text-align: center;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+form {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 28px;
+  flex-wrap: wrap;
+}
+
+input[type="text"] {
+  width: min(100%, 540px);
+  padding: 16px 18px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-main);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease, background 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+input[type="text"]::placeholder {
+  color: rgba(245, 247, 251, 0.55);
+}
+
+input[type="text"]:focus {
+  border-color: rgba(124, 92, 255, 0.8);
+  box-shadow: 0 0 0 4px rgba(124, 92, 255, 0.2);
+  background: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+button {
+  padding: 16px 22px;
+  border: 0;
+  border-radius: 16px;
+  background: linear-gradient(135deg, var(--accent), #9b7bff);
+  color: white;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  cursor: pointer;
+  box-shadow: 0 18px 30px rgba(124, 92, 255, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 34px rgba(124, 92, 255, 0.34);
+  filter: brightness(1.05);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+.movie-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 22px;
+}
+
+.movie-card {
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 22px;
+  background: rgba(14, 18, 28, 0.82);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+
+.movie-card:hover {
+  transform: translateY(-6px);
+  border-color: rgba(124, 92, 255, 0.35);
+  box-shadow: 0 26px 64px rgba(0, 0, 0, 0.38);
+}
+
+.movie-card img {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  object-fit: cover;
+  display: block;
+}
+
+.movie-card h2 {
+  margin: 0;
+  padding: 18px 18px 10px;
+  font-size: 1.08rem;
+  font-weight: 700;
+}
+
+.movie-card p {
+  margin: 0;
+  padding: 0 18px 20px;
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  line-height: 1.55;
+}
+
+.theme-toggle {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border: 1px solid var(--panel-border);
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.theme-toggle-icon {
+  font-size: 1.2rem;
+}
+
+@media (max-width: 600px) {
+  .theme-toggle {
+    top: 12px;
+    right: 12px;
+    padding: 6px 10px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .container {
+    width: min(100% - 40px, 920px);
+    margin: 32px auto;
+    padding: 24px;
+  }
+
+  .title,
+  h1 {
+    font-size: clamp(2.1rem, 3.2vw, 3rem);
+  }
+
+  input[type="text"] {
+    width: min(100%, 460px);
+  }
+
+  .movie-list {
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 18px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .container {
+    padding: 32px;
+  }
+
+  .movie-list {
+    grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  }
+}
+
+@media (max-width: 600px) {
+  .container {
+    width: calc(100% - 16px);
+    margin: 12px auto;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .title,
+  h1 {
+    margin-bottom: 18px;
+    font-size: clamp(1.7rem, 8vw, 2.2rem);
+  }
+
+  form {
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+
+  input[type="text"],
+  button {
+    width: 100%;
+    max-width: none;
+  }
+
+  .movie-list {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  .movie-card {
+    border-radius: 18px;
+  }
+
+  .movie-card h2 {
+    padding: 14px 14px 8px;
+    font-size: 1rem;
+  }
+
+  .movie-card p {
+    padding: 0 14px 16px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 380px) {
+  .container {
+    width: calc(100% - 12px);
+    margin: 8px auto;
+    padding: 14px;
+  }
+
+  input[type="text"],
+  button {
+    padding: 14px 16px;
+    border-radius: 14px;
+  }
+
+  .movie-list {
+    gap: 12px;
+  }
+}
