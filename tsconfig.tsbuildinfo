@@ -1,0 +1,1 @@
+{"root":["./src/main.tsx","./src/vite-env.d.ts","./src/components/moviecard/moviecard.tsx","./src/components/moviesearch/moviesearch.tsx","./src/contexts/themecontext.ts","./src/hooks/usetheme.ts","./src/providers/themeprovider.tsx","./src/services/movieapi.ts","./src/theme/antdtheme.ts","./src/types/movies.ts"],"version":"6.0.2"}
