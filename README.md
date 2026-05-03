@@ -1,6 +1,9 @@
 # Buscador de Peliculas - React + TypeScript
 
-Aplicacion web para buscar peliculas usando la API de The Movie Database (TMDb). El proyecto fue migrado de JavaScript a TypeScript y actualmente usa React, Vite y Ant Design.
+Aplicación web desarrollada con React para búsqueda y exploración de películas mediante consumo de la API de The Movie Database (TMDb). El proyecto fue migrado de JavaScript a TypeScript y actualmente utiliza React, Vite y Ant Design para construir una interfaz moderna, responsive y enfocada en experiencia de usuario.
+
+La aplicación incluye renderizado dinámico de resultados, manejo de estado y visualización organizada de información para facilitar la búsqueda y exploración de contenido en tiempo real.
+
 
 ## Caracteristicas
 
