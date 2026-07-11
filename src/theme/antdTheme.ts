@@ -6,12 +6,12 @@ const { darkAlgorithm, defaultAlgorithm } = theme;
 export const lightTheme: ThemeConfig = {
   algorithm: defaultAlgorithm,
   token: {
-    colorPrimary: '#6c5ce7',
-    colorBgBase: '#f8f9fa',
-    colorTextBase: '#1a1a2e',
+    colorPrimary: '#cf8a22',
+    colorBgBase: '#f6efe4',
+    colorTextBase: '#2b1730',
     borderRadius: 16,
     fontSize: 16,
-    colorBorder: 'rgba(0, 0, 0, 0.1)',
+    colorBorder: 'rgba(43, 23, 48, 0.12)',
     boxShadow: '0 24px 80px rgba(0, 0, 0, 0.15)',
   },
   components: {
@@ -19,7 +19,10 @@ export const lightTheme: ThemeConfig = {
       borderRadius: 16,
       controlHeight: 48,
       fontWeight: 700,
-      primaryShadow: '0 18px 30px rgba(108, 92, 231, 0.28)',
+      primaryShadow: '0 18px 30px rgba(207, 138, 34, 0.28)',
+      // Texto ciruela sobre boton ambar: ~5.1:1, pasa AA. Blanco por
+      // defecto solo da ~3.2:1 sobre este acento.
+      colorTextLightSolid: '#2b1730',
     },
     Input: {
       borderRadius: 16,
@@ -39,12 +42,12 @@ export const lightTheme: ThemeConfig = {
 export const darkTheme: ThemeConfig = {
   algorithm: darkAlgorithm,
   token: {
-    colorPrimary: '#7c5cff',
-    colorBgBase: '#0b1020',
-    colorTextBase: '#f5f7fb',
+    colorPrimary: '#e8a23a',
+    colorBgBase: '#1a0e1e',
+    colorTextBase: '#f6efe4',
     borderRadius: 16,
     fontSize: 16,
-    colorBorder: 'rgba(255, 255, 255, 0.12)',
+    colorBorder: 'rgba(246, 239, 228, 0.14)',
     boxShadow: '0 24px 80px rgba(0, 0, 0, 0.35)',
   },
   components: {
@@ -52,7 +55,10 @@ export const darkTheme: ThemeConfig = {
       borderRadius: 16,
       controlHeight: 48,
       fontWeight: 700,
-      primaryShadow: '0 18px 30px rgba(124, 92, 255, 0.28)',
+      primaryShadow: '0 18px 30px rgba(232, 162, 58, 0.28)',
+      // Texto ciruela sobre boton ambar: ~8.9:1, pasa AA. Blanco por
+      // defecto solo da ~2.1:1 sobre este acento claro.
+      colorTextLightSolid: '#1a0e1e',
     },
     Input: {
       borderRadius: 16,

@@ -1,28 +1,21 @@
 import type { Movie, MovieSearchResponse } from '../types/movies';
 
-const API_BASE_URL = 'https://api.themoviedb.org/3/search/movie';
-const API_TOKEN = import.meta.env.VITE_TMDB_API_TOKEN;
+export interface MovieSearchResult {
+  movies: Movie[];
+  totalPages: number;
+}
 
-export const searchMovies = async (query: string): Promise<Movie[]> => {
+export const searchMovies = async (
+  query: string,
+  page: number = 1
+): Promise<MovieSearchResult> => {
   try {
     if (!query.trim()) {
-      return [];
-    }
-
-    if (!API_TOKEN) {
-      throw new Error(
-        'No se encontro VITE_TMDB_API_TOKEN. Configura la variable de entorno y vuelve a desplegar.'
-      );
+      return { movies: [], totalPages: 0 };
     }
 
     const response = await fetch(
-      `${API_BASE_URL}?query=${encodeURIComponent(query)}`,
-      {
-        headers: {
-          Authorization: `Bearer ${API_TOKEN}`,
-          'Content-Type': 'application/json;charset=utf-8',
-        },
-      }
+      `/api/search?query=${encodeURIComponent(query)}&page=${page}`
     );
 
     if (!response.ok) {
@@ -41,7 +34,7 @@ export const searchMovies = async (query: string): Promise<Movie[]> => {
     }
 
     const data: MovieSearchResponse = await response.json();
-    return data.results ?? [];
+    return { movies: data.results ?? [], totalPages: data.total_pages ?? 0 };
   } catch (error) {
     console.error('Error fetching movies:', error);
     throw error;

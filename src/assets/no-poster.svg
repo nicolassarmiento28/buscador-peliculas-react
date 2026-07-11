@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="500" height="750" viewBox="0 0 500 750">
+  <rect width="500" height="750" fill="#1a0e1e"/>
+  <g fill="none" stroke="#f6efe4" stroke-width="6" opacity="0.4">
+    <rect x="140" y="300" width="220" height="150" rx="12"/>
+    <circle cx="220" cy="375" r="18"/>
+    <path d="M255 355 L305 330 L305 420 L255 395 Z"/>
+  </g>
+  <text x="250" y="500" text-anchor="middle" font-family="sans-serif" font-size="28" fill="#f6efe4" opacity="0.6">
+    Sin imagen
+  </text>
+</svg>

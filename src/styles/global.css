@@ -1,34 +1,46 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Playfair+Display:wght@700;800;900&display=swap');
 
+/* Paleta "Marquesina": ciruela profundo + ambar dorado, luces de cine clasico. */
 :root {
-  --panel-bg: rgba(10, 12, 20, 0.72);
-  --panel-border: rgba(255, 255, 255, 0.12);
-  --text-main: #f5f7fb;
-  --text-muted: rgba(245, 247, 251, 0.72);
-  --accent: #7c5cff;
-  --accent-hover: #6746ff;
+  --font-display: 'Playfair Display', 'Georgia', serif;
+
+  --panel-bg: rgba(43, 23, 48, 0.6);
+  --panel-border: rgba(246, 239, 228, 0.14);
+  --text-main: #f6efe4;
+  --text-muted: rgba(246, 239, 228, 0.72);
+  --accent: #e8a23a;
+  --accent-hover: #f0b859;
+  --accent-secondary: #5a2a4d;
+  /* Texto sobre superficies solidas de acento (botones, badges): el ambar
+     es demasiado claro para texto blanco (ratio ~2.1:1), se usa el ciruela
+     mas oscuro como texto para pasar 4.5:1 (ratio ~8.9:1). */
+  --accent-text-on: #1a0e1e;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
-  --bg-primary: #0b1020;
+  --bg-primary: #1a0e1e;
   --bg-gradient: linear-gradient(
     180deg,
-    rgba(7, 10, 18, 0.5),
-    rgba(7, 10, 18, 0.9)
+    rgba(26, 14, 30, 0.5),
+    rgba(26, 14, 30, 0.9)
   );
 }
 
 [data-theme='light'] {
-  --panel-bg: rgba(255, 255, 255, 0.85);
-  --panel-border: rgba(0, 0, 0, 0.1);
-  --text-main: #1a1a2e;
-  --text-muted: rgba(26, 26, 46, 0.7);
-  --accent: #6c5ce7;
-  --accent-hover: #5f3dc4;
+  --panel-bg: rgba(255, 251, 244, 0.88);
+  --panel-border: rgba(43, 23, 48, 0.12);
+  --text-main: #2b1730;
+  --text-muted: rgba(43, 23, 48, 0.7);
+  --accent: #cf8a22;
+  --accent-hover: #b5761a;
+  --accent-secondary: #5a2a4d;
+  /* Mismo motivo que en oscuro: texto ciruela sobre acento ambar (ratio
+     ~5.1:1) en vez de blanco (ratio ~3.2:1, no pasa AA para texto normal). */
+  --accent-text-on: #2b1730;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.15);
-  --bg-primary: #f8f9fa;
+  --bg-primary: #f6efe4;
   --bg-gradient: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.3),
-    rgba(248, 249, 250, 0.6)
+    rgba(246, 239, 228, 0.6)
   );
 }
 

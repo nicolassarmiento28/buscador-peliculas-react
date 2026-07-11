@@ -34,14 +34,21 @@ npm install
 
 ## Configuracion de entorno
 
-1. Crea o edita el archivo `.env.local` en la raiz del proyecto.
-2. Define tu token de TMDb:
+El token de TMDb se usa solo del lado del servidor, en la funcion
+serverless `api/search.ts`, para que nunca quede expuesto en el bundle
+del cliente.
+
+1. Crea o edita el archivo `.env.local` en la raiz del proyecto (usado por
+   `vercel dev`) o configura la variable en el entorno de Vercel
+   (Project Settings > Environment Variables) para produccion.
+2. Define tu token de TMDb (sin prefijo `VITE_`):
 
 ```env
-VITE_TMDB_API_TOKEN=tu_token_aqui
+TMDB_API_TOKEN=tu_token_aqui
 ```
 
-Puedes usar `.env.example` como referencia.
+Puedes usar `.env.example` como referencia. El cliente llama a
+`/api/search` (mismo origen) en vez de llamar a TMDb directamente.
 
 ## Scripts disponibles
 

@@ -18,13 +18,40 @@
   z-index: 10;
 }
 
+/* Titulo editorial: serif Playfair Display + degrade ambar -> ciruela
+   secundario via background-clip. El fallback (sin soporte de
+   background-clip: text) deja el color solido --accent, que ya cumple
+   contraste AA sobre --bg-primary y --panel-bg en ambos modos. */
 .title {
-  margin: 0 0 24px !important;
+  margin: 0 0 8px !important;
   text-align: center;
+  font-family: var(--font-display);
   font-size: clamp(2rem, 4vw, 3.5rem) !important;
   font-weight: 800 !important;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
   line-height: 1.05 !important;
+  color: var(--accent);
+  background: linear-gradient(
+    100deg,
+    var(--accent) 15%,
+    var(--accent-hover) 45%,
+    var(--accent-secondary) 90%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Subtitulo bajo el titulo principal: Inter (no serif) para no combinar
+   mas de dos familias tipograficas en la misma jerarquia). */
+.subtitle {
+  display: block;
+  margin: 0 0 24px;
+  text-align: center;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.9rem, 1.4vw, 1.05rem);
+  font-weight: 500;
+  color: var(--text-muted);
 }
 
 .searchContainer {
@@ -55,6 +82,56 @@
 
 .empty {
   margin-top: 48px;
+}
+
+/* Estado vacio inicial (antes de la primera busqueda). Distinto de
+   .empty (antd Empty, sin resultados tras buscar): icono grande + titulo
+   serif + copy corto, todo centrado. El implementador solo necesita un
+   icono de antd (ej. VideoCameraOutlined) dentro de .emptyStateIcon. */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 56px;
+  padding: 24px;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.emptyStateIcon {
+  font-size: 48px;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+.emptyStateTitle {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.emptyStateText {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  max-width: 360px;
+  margin: 0;
+}
+
+/* Grid de skeletons mientras carga: mismo Row/Col gutter que .movieList
+   para que el layout no salte al llegar los resultados reales. Usar
+   junto a los .skeletonCard/.skeletonPoster/.skeletonLine de
+   MovieCard.module.css, uno por Col. */
+.skeletonList {
+  margin-top: 28px;
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  margin-top: 28px;
 }
 
 @media (max-width: 600px) {

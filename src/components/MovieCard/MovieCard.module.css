@@ -1,8 +1,8 @@
 .movieCard {
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--panel-border);
   border-radius: 22px !important;
-  background: rgba(14, 18, 28, 0.82);
+  background: var(--panel-bg);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.28);
   transition:
     transform 0.22s ease,
@@ -12,8 +12,14 @@
 
 .movieCard:hover {
   transform: translateY(-6px);
-  border-color: rgba(124, 92, 255, 0.35);
+  border-color: var(--accent);
   box-shadow: 0 26px 64px rgba(0, 0, 0, 0.38);
+}
+
+/* Wrapper del poster: necesario para posicionar el badge de rating encima
+   de la imagen (position: relative como ancla del badge absoluto). */
+.posterWrap {
+  position: relative;
 }
 
 .moviePoster {
@@ -23,11 +29,87 @@
   display: block;
 }
 
-[data-theme='light'] .movieCard {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+/* Badge de rating (vote_average) superpuesto en la esquina del poster.
+   Fondo ciruela secundario + texto ambar: alto contraste sobre poster
+   variable gracias al fondo solido semitransparente + blur. */
+.ratingBadge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 999px;
+  background: rgba(26, 14, 30, 0.78);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(246, 239, 228, 0.18);
+  color: var(--accent);
+  font-family: 'Inter', sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1;
 }
 
-[data-theme='light'] .movieCard:hover {
-  border-color: rgba(108, 92, 231, 0.35);
+.modalPoster {
+  width: 100%;
+  max-width: 260px;
+  display: block;
+  margin: 0 auto 16px;
+  border-radius: 12px;
+}
+
+.ratingBadge svg {
+  font-size: 12px;
+}
+
+/* Skeleton shimmer para MovieCard mientras carga (alternativa a antd
+   Skeleton: mismo look que .moviePoster/.movieCard para que no salte el
+   layout al llegar los resultados reales). */
+.skeletonCard {
+  overflow: hidden;
+  border: 1px solid var(--panel-border);
+  border-radius: 22px;
+  background: var(--panel-bg);
+}
+
+.skeletonPoster {
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  background: linear-gradient(
+    100deg,
+    var(--panel-bg) 30%,
+    rgba(246, 239, 228, 0.14) 50%,
+    var(--panel-bg) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonLine {
+  height: 14px;
+  margin: 14px 16px;
+  border-radius: 6px;
+  background: linear-gradient(
+    100deg,
+    var(--panel-bg) 30%,
+    rgba(246, 239, 228, 0.14) 50%,
+    var(--panel-bg) 70%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+.skeletonLine:last-child {
+  width: 60%;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
 }
