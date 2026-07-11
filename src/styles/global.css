@@ -22,6 +22,11 @@
     rgba(26, 14, 30, 0.5),
     rgba(26, 14, 30, 0.9)
   );
+  /* Scrim para controles superpuestos sobre poster (favorito, rating):
+     mismo tono ciruela oscuro semitransparente en ambos modos porque el
+     fondo es siempre la imagen del poster, no la superficie de la app. */
+  --overlay-scrim: rgba(26, 14, 30, 0.78);
+  --overlay-scrim-border: rgba(246, 239, 228, 0.18);
 }
 
 [data-theme='light'] {
@@ -42,6 +47,8 @@
     rgba(255, 255, 255, 0.3),
     rgba(246, 239, 228, 0.6)
   );
+  --overlay-scrim: rgba(26, 14, 30, 0.78);
+  --overlay-scrim-border: rgba(246, 239, 228, 0.18);
 }
 
 * {
@@ -64,4 +71,11 @@ body {
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+/* Foco de teclado consistente en toda la app (chips, corazon, botones
+   custom): anillo ambar, nunca eliminado sin reemplazo (a11y). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }

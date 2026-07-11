@@ -18,6 +18,17 @@
   z-index: 10;
 }
 
+.favoritesButtonBadge {
+  position: absolute;
+  top: 24px;
+  left: 24px;
+  z-index: 10;
+}
+
+.favoritesButton {
+  border-radius: 16px !important;
+}
+
 /* Titulo editorial: serif Playfair Display + degrade ambar -> ciruela
    secundario via background-clip. El fallback (sin soporte de
    background-clip: text) deja el color solido --accent, que ya cumple
@@ -145,6 +156,11 @@
   .themeToggle {
     top: 12px;
     right: 12px;
+  }
+
+  .favoritesButtonBadge {
+    top: 12px;
+    left: 12px;
   }
 
   .title {

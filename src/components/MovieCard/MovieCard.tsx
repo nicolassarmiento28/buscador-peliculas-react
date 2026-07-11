@@ -1,21 +1,32 @@
 import React, { useState } from 'react';
-import { Card, Modal } from 'antd';
-import { StarFilled } from '@ant-design/icons';
+import { Card } from 'antd';
+import { HeartFilled, HeartOutlined, StarFilled } from '@ant-design/icons';
 import type { Movie } from '../../types/movies';
 import noPoster from '../../assets/no-poster.svg';
+import { MovieDetail } from './MovieDetail';
 import styles from './MovieCard.module.css';
 
 const { Meta } = Card;
 
 interface MovieCardProps {
   movie: Movie;
+  isFavorite: boolean;
+  onToggleFavorite: (movie: Movie) => void;
 }
 
-export const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
+export const MovieCard: React.FC<MovieCardProps> = ({
+  movie,
+  isFavorite,
+  onToggleFavorite,
+}) => {
   const [detailOpen, setDetailOpen] = useState(false);
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : noPoster;
+
+  const favoriteLabel = isFavorite
+    ? 'Quitar de mi lista'
+    : 'Agregar a mi lista';
 
   return (
     <>
@@ -38,6 +49,19 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
               src={posterUrl}
               className={styles.moviePoster}
             />
+            <button
+              type="button"
+              className={styles.favoriteButton}
+              data-active={isFavorite}
+              aria-label={favoriteLabel}
+              title={favoriteLabel}
+              onClick={(event) => {
+                event.stopPropagation();
+                onToggleFavorite(movie);
+              }}
+            >
+              {isFavorite ? <HeartFilled /> : <HeartOutlined />}
+            </button>
             {movie.vote_average ? (
               <span className={styles.ratingBadge}>
                 <StarFilled />
@@ -50,23 +74,14 @@ export const MovieCard: React.FC<MovieCardProps> = ({ movie }) => {
         <Meta title={movie.title} description={movie.overview} />
       </Card>
 
-      <Modal
+      <MovieDetail
+        movie={movie}
+        posterUrl={posterUrl}
         open={detailOpen}
-        onCancel={() => setDetailOpen(false)}
-        footer={null}
-        title={movie.title}
-      >
-        <img alt={movie.title} src={posterUrl} className={styles.modalPoster} />
-        {movie.release_date ? (
-          <p>Fecha de estreno: {movie.release_date}</p>
-        ) : null}
-        {movie.vote_average ? (
-          <p>
-            <StarFilled /> {movie.vote_average.toFixed(1)}
-          </p>
-        ) : null}
-        <p>{movie.overview}</p>
-      </Modal>
+        onClose={() => setDetailOpen(false)}
+        isFavorite={isFavorite}
+        onToggleFavorite={onToggleFavorite}
+      />
     </>
   );
 };

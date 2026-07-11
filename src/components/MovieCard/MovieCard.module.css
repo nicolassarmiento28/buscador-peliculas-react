@@ -64,6 +64,102 @@
   font-size: 12px;
 }
 
+/* Corazon de favorito: mismo scrim que el rating badge, esquina opuesta
+   del poster (top/left vs top/right del rating). */
+.favoriteButton {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 999px;
+  border: 1px solid var(--overlay-scrim-border);
+  background: var(--overlay-scrim);
+  backdrop-filter: blur(6px);
+  color: var(--text-main);
+  opacity: 0.85;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.favoriteButton:hover {
+  opacity: 1;
+}
+
+.favoriteButton[data-active='true'] {
+  color: var(--accent);
+  opacity: 1;
+}
+
+.modalTitle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.modalTitle .favoriteButton {
+  position: static;
+}
+
+.modalGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 768px) {
+  .modalGrid {
+    grid-template-columns: 260px 1fr;
+  }
+}
+
+.modalBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.modalOverview {
+  font-family: 'Inter', sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text-main);
+}
+
+.trailer {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: 12px;
+  border: 1px solid var(--panel-border);
+}
+
+.castGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 12px;
+}
+
+.castName {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-main);
+}
+
+.castCharacter {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
 /* Skeleton shimmer para MovieCard mientras carga (alternativa a antd
    Skeleton: mismo look que .moviePoster/.movieCard para que no salte el
    layout al llegar los resultados reales). */
