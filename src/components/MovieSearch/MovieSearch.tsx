@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Input, Button, Row, Col, Typography, Empty, Spin } from 'antd';
+import { Input, Button, Row, Col, Typography, Empty, Spin, Alert } from 'antd';
 import { SearchOutlined, BulbOutlined, BulbFilled } from '@ant-design/icons';
 import { useTheme } from '../../hooks/useTheme';
 import { searchMovies } from '../../services/movieApi';
@@ -14,17 +14,23 @@ export const MovieSearch: React.FC = () => {
   const [query, setQuery] = useState<string>('');
   const [movies, setMovies] = useState<Movie[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { theme, toggleTheme } = useTheme();
 
   const handleSearch = async (value: string) => {
     if (!value.trim()) return;
 
+    setErrorMessage(null);
     setLoading(true);
     try {
       const results = await searchMovies(value);
       setMovies(results);
     } catch (error) {
-      console.error('Error searching movies:', error);
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Error inesperado al buscar peliculas.';
+      setErrorMessage(message);
       setMovies([]);
     } finally {
       setLoading(false);
@@ -62,6 +68,16 @@ export const MovieSearch: React.FC = () => {
           className={styles.searchInput}
         />
       </div>
+
+      {errorMessage ? (
+        <Alert
+          type="error"
+          showIcon
+          message="No se pudo consultar TMDb"
+          description={errorMessage}
+          className={styles.errorAlert}
+        />
+      ) : null}
 
       {loading ? (
         <div className={styles.loadingContainer}>

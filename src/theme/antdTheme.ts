@@ -30,6 +30,9 @@ export const lightTheme: ThemeConfig = {
       borderRadius: 22,
       boxShadow: '0 18px 50px rgba(0, 0, 0, 0.28)',
     },
+    Alert: {
+      borderRadius: 16,
+    },
   },
 };
 
@@ -59,6 +62,9 @@ export const darkTheme: ThemeConfig = {
     Card: {
       borderRadius: 22,
       boxShadow: '0 18px 50px rgba(0, 0, 0, 0.28)',
+    },
+    Alert: {
+      borderRadius: 16,
     },
   },
 };

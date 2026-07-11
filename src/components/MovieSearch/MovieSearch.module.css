@@ -42,6 +42,10 @@
   margin-top: 28px;
 }
 
+.errorAlert {
+  margin-bottom: 24px;
+}
+
 .loadingContainer {
   display: flex;
   justify-content: center;
