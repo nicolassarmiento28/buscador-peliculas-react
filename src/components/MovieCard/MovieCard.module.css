@@ -95,6 +95,11 @@
   opacity: 1;
 }
 
+.favoriteButton[data-saving='true'] {
+  opacity: 0.5;
+  cursor: wait;
+}
+
 .modalTitle {
   display: flex;
   align-items: center;

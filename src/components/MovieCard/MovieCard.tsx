@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { Card } from 'antd';
-import { HeartFilled, HeartOutlined, StarFilled } from '@ant-design/icons';
+import { StarFilled } from '@ant-design/icons';
 import type { Movie } from '../../types/movies';
 import noPoster from '../../assets/no-poster.svg';
 import { MovieDetail } from './MovieDetail';
+import { FavoriteButton } from './FavoriteButton';
 import styles from './MovieCard.module.css';
 
 const { Meta } = Card;
@@ -12,21 +13,23 @@ interface MovieCardProps {
   movie: Movie;
   isFavorite: boolean;
   onToggleFavorite: (movie: Movie) => void;
+  readOnly?: boolean;
+  authRequired?: boolean;
+  saving?: boolean;
 }
 
 export const MovieCard: React.FC<MovieCardProps> = ({
   movie,
   isFavorite,
   onToggleFavorite,
+  readOnly = false,
+  authRequired = false,
+  saving = false,
 }) => {
   const [detailOpen, setDetailOpen] = useState(false);
   const posterUrl = movie.poster_path
     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
     : noPoster;
-
-  const favoriteLabel = isFavorite
-    ? 'Quitar de mi lista'
-    : 'Agregar a mi lista';
 
   return (
     <>
@@ -49,19 +52,16 @@ export const MovieCard: React.FC<MovieCardProps> = ({
               src={posterUrl}
               className={styles.moviePoster}
             />
-            <button
-              type="button"
-              className={styles.favoriteButton}
-              data-active={isFavorite}
-              aria-label={favoriteLabel}
-              title={favoriteLabel}
-              onClick={(event) => {
-                event.stopPropagation();
-                onToggleFavorite(movie);
-              }}
-            >
-              {isFavorite ? <HeartFilled /> : <HeartOutlined />}
-            </button>
+            {readOnly ? null : (
+              <FavoriteButton
+                movie={movie}
+                isFavorite={isFavorite}
+                onToggleFavorite={onToggleFavorite}
+                authRequired={authRequired}
+                saving={saving}
+                stopPropagation
+              />
+            )}
             {movie.vote_average ? (
               <span className={styles.ratingBadge}>
                 <StarFilled />
@@ -81,6 +81,9 @@ export const MovieCard: React.FC<MovieCardProps> = ({
         onClose={() => setDetailOpen(false)}
         isFavorite={isFavorite}
         onToggleFavorite={onToggleFavorite}
+        readOnly={readOnly}
+        authRequired={authRequired}
+        saving={saving}
       />
     </>
   );

@@ -63,7 +63,7 @@ export default async function handler(req: any, res: any) {
     }
 
     url = `${TMDB_BASE_URL}/discover/movie?with_genres=${encodeURIComponent(genreId)}&sort_by=${encodeURIComponent(sortBy)}&page=${encodeURIComponent(page)}`;
-  } else if (type === 'credits' || type === 'videos') {
+  } else if (type === 'credits' || type === 'videos' || type === 'recommendations') {
     const movieId = req.query?.id;
     if (!isValidId(movieId)) {
       res.status(400).json({ status_message: 'El parametro "id" es invalido.' });

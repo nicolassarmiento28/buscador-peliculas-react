@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
   Input,
   Button,
@@ -8,7 +9,6 @@ import {
   Empty,
   Alert,
   Pagination,
-  Badge,
 } from 'antd';
 import {
   SearchOutlined,
@@ -18,7 +18,8 @@ import {
   HeartOutlined,
 } from '@ant-design/icons';
 import { useTheme } from '../../hooks/useTheme';
-import { useFavorites } from '../../hooks/useFavorites';
+import { useAuth } from '../../hooks/useAuth';
+import { useMyList } from '../../hooks/useMyList';
 import {
   searchMovies,
   getTrending,
@@ -27,6 +28,7 @@ import {
 import { MovieCard } from '../MovieCard/MovieCard';
 import { TrendingSection } from '../TrendingSection/TrendingSection';
 import { GenreChips } from '../GenreChips/GenreChips';
+import { AuthButton } from '../AuthButton/AuthButton';
 import type { Movie, SortBy } from '../../types/movies';
 import styles from './MovieSearch.module.css';
 import cardStyles from '../MovieCard/MovieCard.module.css';
@@ -37,10 +39,7 @@ const { Search } = Input;
 const DEBOUNCE_MS = 450;
 const SKELETON_COUNT = 8;
 
-type View = 'search' | 'favorites';
-
 export const MovieSearch: React.FC = () => {
-  const [view, setView] = useState<View>('search');
   const [query, setQuery] = useState<string>('');
   const [activeGenreId, setActiveGenreId] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<SortBy>('popularity.desc');
@@ -51,7 +50,8 @@ export const MovieSearch: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [trending, setTrending] = useState<Movie[]>([]);
   const { theme, toggleTheme } = useTheme();
-  const { favorites, isFavorite, toggleFavorite } = useFavorites();
+  const { user } = useAuth();
+  const { isFavorite, isSaving, toggleFavorite } = useMyList(user);
 
   useEffect(() => {
     getTrending()
@@ -161,8 +161,7 @@ export const MovieSearch: React.FC = () => {
     }
   };
 
-  const isBrowsing =
-    view === 'search' && !query.trim() && activeGenreId === null;
+  const isBrowsing = !query.trim() && activeGenreId === null;
 
   return (
     <div className={styles.container}>
@@ -176,147 +175,121 @@ export const MovieSearch: React.FC = () => {
         aria-label={`Cambiar a modo ${theme === 'dark' ? 'claro' : 'oscuro'}`}
       />
 
-      <Badge
-        count={favorites.length}
-        className={styles.favoritesButtonBadge}
-        size="small"
-      >
-        <Button
-          className={styles.favoritesButton}
-          onClick={() => setView(view === 'favorites' ? 'search' : 'favorites')}
-          icon={<HeartOutlined />}
-          size="large"
-          type={view === 'favorites' ? 'primary' : 'default'}
-        >
-          Mi lista
-        </Button>
-      </Badge>
+      <div className={styles.favoritesButtonBadge}>
+        <AuthButton />
+        <Link to="/mi-lista">
+          <Button
+            className={styles.favoritesButton}
+            icon={<HeartOutlined />}
+            size="large"
+          >
+            Mi lista
+          </Button>
+        </Link>
+      </div>
 
       <Title level={1} className={styles.title}>
         Buscador de Películas
       </Title>
       <span className={styles.subtitle}>Explora el catálogo de TMDb</span>
 
-      {view === 'favorites' ? (
-        favorites.length > 0 ? (
+      <div className={styles.searchContainer}>
+        <Search
+          placeholder="Busca una película..."
+          enterButton={
+            <Button type="primary" icon={<SearchOutlined />}>
+              Buscar
+            </Button>
+          }
+          size="large"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onSearch={handleSearch}
+          loading={loading}
+          className={styles.searchInput}
+          aria-label="Buscar película por título"
+        />
+      </div>
+
+      <GenreChips
+        activeGenreId={activeGenreId}
+        sortBy={sortBy}
+        onSelectGenre={handleSelectGenre}
+        onSortChange={handleSortChange}
+      />
+
+      {errorMessage ? (
+        <Alert
+          type="error"
+          showIcon
+          message="No se pudo consultar TMDb"
+          description={errorMessage}
+          className={styles.errorAlert}
+        />
+      ) : null}
+
+      {isBrowsing ? (
+        <TrendingSection
+          movies={trending}
+          isFavorite={isFavorite}
+          onToggleFavorite={toggleFavorite}
+          authRequired={!user}
+          isSaving={isSaving}
+        />
+      ) : null}
+
+      {loading ? (
+        <Row gutter={[22, 22]} className={styles.skeletonList}>
+          {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
+            <Col key={index} xs={24} sm={12} md={8} lg={6} xl={6}>
+              <div className={cardStyles.skeletonCard}>
+                <div className={cardStyles.skeletonPoster} />
+                <div className={cardStyles.skeletonLine} />
+                <div className={cardStyles.skeletonLine} />
+              </div>
+            </Col>
+          ))}
+        </Row>
+      ) : movies.length > 0 ? (
+        <>
           <Row gutter={[22, 22]} className={styles.movieList}>
-            {favorites.map((movie) => (
+            {movies.map((movie) => (
               <Col key={movie.id} xs={24} sm={12} md={8} lg={6} xl={6}>
                 <MovieCard
                   movie={movie}
                   isFavorite={isFavorite(movie.id)}
                   onToggleFavorite={toggleFavorite}
+                  authRequired={!user}
+                  saving={isSaving(movie.id)}
                 />
               </Col>
             ))}
           </Row>
-        ) : (
-          <div className={styles.emptyState}>
-            <HeartOutlined className={styles.emptyStateIcon} />
-            <p className={styles.emptyStateTitle}>Tu lista esta vacia</p>
-            <p className={styles.emptyStateText}>
-              Explora el catalogo y toca el corazon de una pelicula para
-              guardarla aqui.
-            </p>
-          </div>
-        )
-      ) : (
-        <>
-          <div className={styles.searchContainer}>
-            <Search
-              placeholder="Busca una película..."
-              enterButton={
-                <Button type="primary" icon={<SearchOutlined />}>
-                  Buscar
-                </Button>
-              }
-              size="large"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onSearch={handleSearch}
-              loading={loading}
-              className={styles.searchInput}
-              aria-label="Buscar película por título"
-            />
-          </div>
-
-          <GenreChips
-            activeGenreId={activeGenreId}
-            sortBy={sortBy}
-            onSelectGenre={handleSelectGenre}
-            onSortChange={handleSortChange}
-          />
-
-          {errorMessage ? (
-            <Alert
-              type="error"
-              showIcon
-              message="No se pudo consultar TMDb"
-              description={errorMessage}
-              className={styles.errorAlert}
+          {totalPages > 1 ? (
+            <Pagination
+              current={page}
+              total={Math.min(totalPages, 500)}
+              pageSize={1}
+              onChange={handlePageChange}
+              className={styles.pagination}
+              showSizeChanger={false}
             />
           ) : null}
-
-          {isBrowsing ? (
-            <TrendingSection
-              movies={trending}
-              isFavorite={isFavorite}
-              onToggleFavorite={toggleFavorite}
-            />
-          ) : null}
-
-          {loading ? (
-            <Row gutter={[22, 22]} className={styles.skeletonList}>
-              {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
-                <Col key={index} xs={24} sm={12} md={8} lg={6} xl={6}>
-                  <div className={cardStyles.skeletonCard}>
-                    <div className={cardStyles.skeletonPoster} />
-                    <div className={cardStyles.skeletonLine} />
-                    <div className={cardStyles.skeletonLine} />
-                  </div>
-                </Col>
-              ))}
-            </Row>
-          ) : movies.length > 0 ? (
-            <>
-              <Row gutter={[22, 22]} className={styles.movieList}>
-                {movies.map((movie) => (
-                  <Col key={movie.id} xs={24} sm={12} md={8} lg={6} xl={6}>
-                    <MovieCard
-                      movie={movie}
-                      isFavorite={isFavorite(movie.id)}
-                      onToggleFavorite={toggleFavorite}
-                    />
-                  </Col>
-                ))}
-              </Row>
-              {totalPages > 1 ? (
-                <Pagination
-                  current={page}
-                  total={Math.min(totalPages, 500)}
-                  pageSize={1}
-                  onChange={handlePageChange}
-                  className={styles.pagination}
-                  showSizeChanger={false}
-                />
-              ) : null}
-            </>
-          ) : query || activeGenreId !== null ? (
-            <Empty
-              description="No se encontraron películas"
-              className={styles.empty}
-            />
-          ) : (
-            <div className={styles.emptyState}>
-              <VideoCameraOutlined className={styles.emptyStateIcon} />
-              <p className={styles.emptyStateTitle}>Empieza tu búsqueda</p>
-              <p className={styles.emptyStateText}>
-                Escribe el título de una película para descubrir su información
-                en TMDb.
-              </p>
-            </div>
-          )}
         </>
+      ) : query || activeGenreId !== null ? (
+        <Empty
+          description="No se encontraron películas"
+          className={styles.empty}
+        />
+      ) : (
+        <div className={styles.emptyState}>
+          <VideoCameraOutlined className={styles.emptyStateIcon} />
+          <p className={styles.emptyStateTitle}>Empieza tu búsqueda</p>
+          <p className={styles.emptyStateText}>
+            Escribe el título de una película para descubrir su información en
+            TMDb.
+          </p>
+        </div>
       )}
     </div>
   );

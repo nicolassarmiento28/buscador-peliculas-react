@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Spin } from 'antd';
-import { HeartFilled, HeartOutlined, StarFilled } from '@ant-design/icons';
+import { StarFilled } from '@ant-design/icons';
 import { getMovieCredits, getMovieVideos } from '../../services/movieApi';
 import type { Cast, Movie, Video } from '../../types/movies';
+import { FavoriteButton } from './FavoriteButton';
 import styles from './MovieCard.module.css';
 
 const CAST_LIMIT = 9;
@@ -17,6 +18,9 @@ interface MovieDetailProps {
   onClose: () => void;
   isFavorite: boolean;
   onToggleFavorite: (movie: Movie) => void;
+  readOnly?: boolean;
+  authRequired?: boolean;
+  saving?: boolean;
 }
 
 export const MovieDetail: React.FC<MovieDetailProps> = ({
@@ -26,6 +30,9 @@ export const MovieDetail: React.FC<MovieDetailProps> = ({
   onClose,
   isFavorite,
   onToggleFavorite,
+  readOnly = false,
+  authRequired = false,
+  saving = false,
 }) => {
   const [cast, setCast] = useState<Cast[]>([]);
   const [trailer, setTrailer] = useState<Video | null>(null);
@@ -67,10 +74,6 @@ export const MovieDetail: React.FC<MovieDetailProps> = ({
     };
   }, [open, movie.id]);
 
-  const favoriteLabel = isFavorite
-    ? 'Quitar de mi lista'
-    : 'Agregar a mi lista';
-
   return (
     <Modal
       open={open}
@@ -80,16 +83,15 @@ export const MovieDetail: React.FC<MovieDetailProps> = ({
       title={
         <span className={styles.modalTitle}>
           {movie.title}
-          <button
-            type="button"
-            className={styles.favoriteButton}
-            data-active={isFavorite}
-            aria-label={favoriteLabel}
-            title={favoriteLabel}
-            onClick={() => onToggleFavorite(movie)}
-          >
-            {isFavorite ? <HeartFilled /> : <HeartOutlined />}
-          </button>
+          {readOnly ? null : (
+            <FavoriteButton
+              movie={movie}
+              isFavorite={isFavorite}
+              onToggleFavorite={onToggleFavorite}
+              authRequired={authRequired}
+              saving={saving}
+            />
+          )}
         </span>
       }
     >

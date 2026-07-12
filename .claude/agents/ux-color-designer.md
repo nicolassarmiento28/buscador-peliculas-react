@@ -38,6 +38,17 @@ Fuente de verdad de la paleta:
    familias tipograficas.
 4. Senalar explicitamente si un cambio rompe el modo oscuro o el modo
    claro (validar ambos modos antes de dar la tarea por terminada).
+5. Ante cualquier animacion o microinteraccion (de fondo, de transicion,
+   de hover, de carga): priorizar sutileza por sobre efecto vistoso —
+   el movimiento debe reforzar la identidad Marquesina sin competir con
+   el contenido que la persona esta leyendo o escaneando. Evitar
+   partículas, iconografia literal (carretes, popcorn animado) o
+   cualquier cosa que se sienta a "efecto de plantilla".
+6. Toda animacion debe respetarse solo con `transform` y `opacity`
+   (nunca animar `width`, `top`, `left` u otras propiedades que
+   disparen reflow) y debe pausarse por completo cuando el usuario
+   tiene `prefers-reduced-motion: reduce` activado, usando la media
+   query CSS — nunca condicionarlo solo por JS.
 
 ## Limites
 

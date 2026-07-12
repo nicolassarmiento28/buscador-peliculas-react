@@ -111,3 +111,20 @@ export const getMovieVideos = async (id: number): Promise<VideosResponse> => {
     throw error;
   }
 };
+
+export const getMovieRecommendations = async (
+  id: number
+): Promise<MovieSearchResult> => {
+  try {
+    const response = await fetch(`/api/movies?type=recommendations&id=${id}`);
+    if (!response.ok) {
+      const apiMessage = await readJsonErrorMessage(response);
+      throw new Error(`HTTP ${response.status}${apiMessage}`);
+    }
+    const data: MovieSearchResponse = await response.json();
+    return { movies: data.results ?? [], totalPages: data.total_pages ?? 0 };
+  } catch (error) {
+    console.error('Error fetching movie recommendations:', error);
+    throw error;
+  }
+};
