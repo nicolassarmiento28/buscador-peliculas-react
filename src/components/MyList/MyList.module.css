@@ -40,6 +40,10 @@
   margin-top: 8px;
 }
 
+.movieList :global(.ant-col) {
+  display: flex;
+}
+
 .emptyState {
   display: flex;
   flex-direction: column;
