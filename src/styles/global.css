@@ -27,6 +27,13 @@
      fondo es siempre la imagen del poster, no la superficie de la app. */
   --overlay-scrim: rgba(26, 14, 30, 0.78);
   --overlay-scrim-border: rgba(246, 239, 228, 0.18);
+
+  --curtain-color: var(--accent-secondary);
+  --curtain-duration: 900ms;
+  --curtain-delay: 400ms;
+  --curtain-easing: cubic-bezier(0.65, 0, 0.35, 1);
+  --grain-opacity: 0.035;
+  --drift-duration: 60s;
 }
 
 [data-theme='light'] {
@@ -71,6 +78,52 @@ body {
   transition:
     background-color 0.3s ease,
     color 0.3s ease;
+}
+
+/* Root de React por encima de los pseudo-elementos de ambiente (z-index
+   negativo) para que el contenido nunca quede tapado. */
+#root {
+  position: relative;
+  z-index: 0;
+}
+
+/* Fondo ambiente: parallax lento + grano de pelicula, sobre la base
+   --bg-gradient/--bg-primary/fondo.jpg ya definida arriba en body. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -10%;
+  background: var(--bg-gradient);
+  animation: marquesina-drift var(--drift-duration, 60s) ease-in-out infinite
+    alternate;
+  z-index: -2;
+  pointer-events: none;
+}
+
+@keyframes marquesina-drift {
+  from {
+    transform: translate(0, 0);
+  }
+  to {
+    transform: translate(-4%, -3%);
+  }
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  opacity: var(--grain-opacity, 0.035);
+  mix-blend-mode: overlay;
+  z-index: -1;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body::before {
+    animation: none;
+  }
 }
 
 /* Foco de teclado consistente en toda la app (chips, corazon, botones

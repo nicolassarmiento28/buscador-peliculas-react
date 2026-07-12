@@ -1,0 +1,44 @@
+.panel {
+  position: fixed;
+  inset: 0;
+  width: 50%;
+  z-index: 1000;
+  background:
+    repeating-linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.18) 0px,
+      rgba(0, 0, 0, 0.18) 2px,
+      transparent 2px,
+      transparent 22px
+    ),
+    var(--curtain-color);
+  transition: transform var(--curtain-duration) var(--curtain-easing);
+}
+
+.left {
+  left: 0;
+  box-shadow: inset -40px 0 60px rgba(0, 0, 0, 0.4);
+}
+
+.right {
+  right: 0;
+  box-shadow: inset 40px 0 60px rgba(0, 0, 0, 0.4);
+}
+
+.open.left {
+  transform: translateX(-100%);
+}
+
+.open.right {
+  transform: translateX(100%);
+}
+
+@media (max-width: 599px) {
+  .left {
+    box-shadow: inset -20px 0 60px rgba(0, 0, 0, 0.4);
+  }
+
+  .right {
+    box-shadow: inset 20px 0 60px rgba(0, 0, 0, 0.4);
+  }
+}
