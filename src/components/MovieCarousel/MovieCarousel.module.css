@@ -1,5 +1,25 @@
 .section {
-  margin-bottom: 28px;
+  margin-bottom: 0;
+}
+
+.section.highlight {
+  animation: rowFlash 1.3s ease-out;
+  border-radius: 16px;
+}
+
+@keyframes rowFlash {
+  0% {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+  100% {
+    box-shadow: 0 0 0 2px transparent;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section.highlight {
+    animation: none;
+  }
 }
 
 .title {

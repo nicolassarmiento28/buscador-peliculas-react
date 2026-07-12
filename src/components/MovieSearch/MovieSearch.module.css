@@ -1,4 +1,4 @@
-.container {
+.header {
   width: min(1120px, calc(100% - 32px));
   margin: 48px auto;
   padding: 28px;
@@ -9,6 +9,14 @@
   box-shadow: var(--shadow);
   position: relative;
   min-height: 400px;
+}
+
+.feed {
+  width: min(1120px, calc(100% - 32px));
+  margin: 0 auto 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
 }
 
 /* Titulo editorial: serif Playfair Display + degrade ambar -> ciruela
@@ -132,11 +140,16 @@
 }
 
 @media (max-width: 600px) {
-  .container {
+  .header {
     width: calc(100% - 16px);
     margin: 12px auto;
     padding: 16px;
     border-radius: 20px;
+  }
+
+  .feed {
+    width: calc(100% - 16px);
+    margin: 0 auto 48px;
   }
 
   .title {
@@ -150,10 +163,15 @@
 }
 
 @media (min-width: 768px) and (max-width: 1024px) {
-  .container {
+  .header {
     width: min(100% - 40px, 920px);
     margin: 32px auto;
     padding: 24px;
+  }
+
+  .feed {
+    width: min(100% - 40px, 920px);
+    margin: 0 auto 48px;
   }
 
   .title {
@@ -162,15 +180,20 @@
 }
 
 @media (min-width: 1025px) {
-  .container {
+  .header {
     padding: 32px;
   }
 }
 
 @media (max-width: 380px) {
-  .container {
+  .header {
     width: calc(100% - 12px);
     margin: 8px auto;
     padding: 14px;
+  }
+
+  .feed {
+    width: calc(100% - 12px);
+    margin: 0 auto 48px;
   }
 }

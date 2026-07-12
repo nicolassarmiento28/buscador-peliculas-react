@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import {
   discoverByGenre,
   getMovieRecommendations,
+  getTopRated,
+  getUpcoming,
   searchMovies,
 } from '../../services/movieApi';
 import { MovieCarousel } from '../MovieCarousel/MovieCarousel';
@@ -60,12 +62,14 @@ interface GenreRowProps extends RowFavoriteProps {
   genreId: number;
   genreName: string;
   sortBy: SortBy;
+  highlighted?: boolean;
 }
 
 export const GenreRow: React.FC<GenreRowProps> = ({
   genreId,
   genreName,
   sortBy,
+  highlighted,
   ...favoriteProps
 }) => {
   const [movies, setMovies] = useState<Movie[]>([]);
@@ -84,7 +88,63 @@ export const GenreRow: React.FC<GenreRowProps> = ({
     };
   }, [genreId, genreName, sortBy]);
 
-  return <MovieCarousel movies={movies} title={genreName} {...favoriteProps} />;
+  return (
+    <MovieCarousel
+      movies={movies}
+      title={genreName}
+      id={`row-genre-${genreId}`}
+      highlighted={highlighted}
+      {...favoriteProps}
+    />
+  );
+};
+
+export const TopRatedRow: React.FC<RowFavoriteProps> = (favoriteProps) => {
+  const [movies, setMovies] = useState<Movie[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getTopRated()
+      .then(({ movies: results }) => {
+        if (!cancelled) setMovies(results);
+      })
+      .catch((error) =>
+        console.error('Error cargando mejor valoradas:', error)
+      );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <MovieCarousel movies={movies} title="Mejor valoradas" {...favoriteProps} />
+  );
+};
+
+export const UpcomingRow: React.FC<RowFavoriteProps> = (favoriteProps) => {
+  const [movies, setMovies] = useState<Movie[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    getUpcoming()
+      .then(({ movies: results }) => {
+        if (!cancelled) setMovies(results);
+      })
+      .catch((error) =>
+        console.error('Error cargando proximos estrenos:', error)
+      );
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  return (
+    <MovieCarousel
+      movies={movies}
+      title="Próximos estrenos"
+      {...favoriteProps}
+    />
+  );
 };
 
 interface RecommendedRowProps extends RowFavoriteProps {

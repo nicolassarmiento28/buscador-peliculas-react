@@ -11,6 +11,8 @@ interface MovieCarouselProps {
   readOnly?: boolean;
   authRequired?: boolean;
   isSaving?: (id: number) => boolean;
+  id?: string;
+  highlighted?: boolean;
 }
 
 export const MovieCarousel: React.FC<MovieCarouselProps> = ({
@@ -21,13 +23,18 @@ export const MovieCarousel: React.FC<MovieCarouselProps> = ({
   readOnly = false,
   authRequired = false,
   isSaving,
+  id,
+  highlighted = false,
 }) => {
   if (movies.length === 0) {
     return null;
   }
 
   return (
-    <section className={styles.section}>
+    <section
+      id={id}
+      className={`${styles.section} ${highlighted ? styles.highlight : ''}`}
+    >
       <h2 className={styles.title}>{title}</h2>
       <div className={styles.track}>
         <div className={styles.row}>

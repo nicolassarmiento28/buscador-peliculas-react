@@ -63,6 +63,40 @@ export const getTrending = async (
   }
 };
 
+export const getTopRated = async (
+  page: number = 1
+): Promise<MovieSearchResult> => {
+  try {
+    const response = await fetch(`/api/movies?type=top_rated&page=${page}`);
+    if (!response.ok) {
+      const apiMessage = await readJsonErrorMessage(response);
+      throw new Error(`HTTP ${response.status}${apiMessage}`);
+    }
+    const data: MovieSearchResponse = await response.json();
+    return { movies: data.results ?? [], totalPages: data.total_pages ?? 0 };
+  } catch (error) {
+    console.error('Error fetching top rated movies:', error);
+    throw error;
+  }
+};
+
+export const getUpcoming = async (
+  page: number = 1
+): Promise<MovieSearchResult> => {
+  try {
+    const response = await fetch(`/api/movies?type=upcoming&page=${page}`);
+    if (!response.ok) {
+      const apiMessage = await readJsonErrorMessage(response);
+      throw new Error(`HTTP ${response.status}${apiMessage}`);
+    }
+    const data: MovieSearchResponse = await response.json();
+    return { movies: data.results ?? [], totalPages: data.total_pages ?? 0 };
+  } catch (error) {
+    console.error('Error fetching upcoming movies:', error);
+    throw error;
+  }
+};
+
 export const discoverByGenre = async (
   genreId: number,
   sortBy: SortBy = 'popularity.desc',

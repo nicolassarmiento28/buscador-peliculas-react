@@ -36,12 +36,14 @@ export default async function handler(req: any, res: any) {
 
   let url: string;
 
-  if (type === 'trending') {
+  if (type === 'trending' || type === 'top_rated' || type === 'upcoming') {
     if (!isValidPage(page)) {
       res.status(400).json({ status_message: 'El parametro "page" es invalido.' });
       return;
     }
-    url = `${TMDB_BASE_URL}/trending/movie/day?page=${encodeURIComponent(page)}`;
+    const path =
+      type === 'trending' ? 'trending/movie/day' : `movie/${type}`;
+    url = `${TMDB_BASE_URL}/${path}?page=${encodeURIComponent(page)}`;
   } else if (type === 'discover') {
     const genreId = req.query?.genre_id;
     const sortBy =

@@ -7,7 +7,13 @@ import { useFirstListMovieId } from '../../hooks/useFirstListMovieId';
 import { getTrending } from '../../services/movieApi';
 import { MovieCarousel } from '../MovieCarousel/MovieCarousel';
 import { GenreChips } from '../GenreChips/GenreChips';
-import { GenreRow, RecommendedRow, SearchRow } from './MovieRows';
+import {
+  GenreRow,
+  RecommendedRow,
+  SearchRow,
+  TopRatedRow,
+  UpcomingRow,
+} from './MovieRows';
 import { GENRES } from '../../constants/genres';
 import type { Movie, SortBy } from '../../types/movies';
 import styles from './MovieSearch.module.css';
@@ -24,6 +30,9 @@ export const MovieSearch: React.FC = () => {
   const [sortBy, setSortBy] = useState<SortBy>('popularity.desc');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [trending, setTrending] = useState<Movie[]>([]);
+  const [highlightedGenreId, setHighlightedGenreId] = useState<number | null>(
+    null
+  );
   const { user } = useAuth();
   const { isFavorite, isSaving, toggleFavorite } = useMyList(user);
   const firstListMovieId = useFirstListMovieId(user);
@@ -46,7 +55,22 @@ export const MovieSearch: React.FC = () => {
     return () => clearTimeout(timer);
   }, [query]);
 
+  const FIXED_GENRE_IDS = [28, 35];
+
   const handleToggleGenre = (genreId: number) => {
+    // Los generos con fila fija (Accion/Comedia) nunca se duplican ni se
+    // pueden quitar por chip: siempre llevan a su fila existente.
+    if (FIXED_GENRE_IDS.includes(genreId)) {
+      document
+        .getElementById(`row-genre-${genreId}`)
+        ?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      setHighlightedGenreId(genreId);
+      setTimeout(() => setHighlightedGenreId(null), 1300);
+      return;
+    }
+
+    // Generos agregados manualmente: el chip sigue siendo un toggle real
+    // (agrega la fila si no existe, la quita si ya estaba activa).
     setActiveGenreIds((prev) =>
       prev.includes(genreId)
         ? prev.filter((id) => id !== genreId)
@@ -64,78 +88,104 @@ export const MovieSearch: React.FC = () => {
   const isSearching = debouncedQuery.length > 0;
 
   return (
-    <div className={styles.container}>
-      <Title level={1} className={styles.title}>
-        Buscador de Películas
-      </Title>
-      <span className={styles.subtitle}>Explora el catálogo de TMDb</span>
+    <>
+      <div className={styles.header}>
+        <Title level={1} className={styles.title}>
+          Buscador de Películas
+        </Title>
+        <span className={styles.subtitle}>Explora el catálogo de TMDb</span>
 
-      <div className={styles.searchContainer}>
-        <Search
-          placeholder="Busca una película..."
-          enterButton={
-            <Button type="primary" icon={<SearchOutlined />}>
-              Buscar
-            </Button>
-          }
-          size="large"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          className={styles.searchInput}
-          aria-label="Buscar película por título"
+        <div className={styles.searchContainer}>
+          <Search
+            placeholder="Busca una película..."
+            enterButton={
+              <Button type="primary" icon={<SearchOutlined />}>
+                Buscar
+              </Button>
+            }
+            size="large"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className={styles.searchInput}
+            aria-label="Buscar película por título"
+          />
+        </div>
+
+        <GenreChips
+          activeGenreIds={activeGenreIds}
+          sortBy={sortBy}
+          onSelectGenre={handleToggleGenre}
+          onSortChange={setSortBy}
         />
+
+        {errorMessage ? (
+          <Alert
+            type="error"
+            showIcon
+            message="No se pudo consultar TMDb"
+            description={errorMessage}
+            className={styles.errorAlert}
+          />
+        ) : null}
       </div>
 
-      <GenreChips
-        activeGenreIds={activeGenreIds}
-        sortBy={sortBy}
-        onSelectGenre={handleToggleGenre}
-        onSortChange={setSortBy}
-      />
-
-      {errorMessage ? (
-        <Alert
-          type="error"
-          showIcon
-          message="No se pudo consultar TMDb"
-          description={errorMessage}
-          className={styles.errorAlert}
-        />
-      ) : null}
-
-      {isSearching ? (
-        <SearchRow
-          query={debouncedQuery}
-          onError={setErrorMessage}
-          {...favoriteProps}
-        />
-      ) : (
-        <>
-          <MovieCarousel
-            movies={trending}
-            title="En tendencia hoy"
+      <div className={styles.feed}>
+        {isSearching ? (
+          <SearchRow
+            query={debouncedQuery}
+            onError={setErrorMessage}
             {...favoriteProps}
           />
+        ) : (
+          <>
+            <MovieCarousel
+              movies={trending}
+              title="En tendencia hoy"
+              {...favoriteProps}
+            />
 
-          {user && firstListMovieId ? (
-            <RecommendedRow movieId={firstListMovieId} {...favoriteProps} />
-          ) : null}
+            <TopRatedRow {...favoriteProps} />
 
-          {activeGenreIds.map((genreId) => {
-            const genre = GENRES.find((item) => item.id === genreId);
-            if (!genre) return null;
-            return (
-              <GenreRow
-                key={genreId}
-                genreId={genreId}
-                genreName={genre.name}
-                sortBy={sortBy}
-                {...favoriteProps}
-              />
-            );
-          })}
-        </>
-      )}
-    </div>
+            <UpcomingRow {...favoriteProps} />
+
+            {user && firstListMovieId ? (
+              <RecommendedRow movieId={firstListMovieId} {...favoriteProps} />
+            ) : null}
+
+            {FIXED_GENRE_IDS.map((genreId) => {
+              const genre = GENRES.find((item) => item.id === genreId);
+              if (!genre) return null;
+              return (
+                <GenreRow
+                  key={genreId}
+                  genreId={genreId}
+                  genreName={genre.name}
+                  sortBy={sortBy}
+                  highlighted={highlightedGenreId === genreId}
+                  {...favoriteProps}
+                />
+              );
+            })}
+
+            {activeGenreIds
+              .filter((genreId) => !FIXED_GENRE_IDS.includes(genreId))
+              .map((genreId) => {
+                const genre = GENRES.find((item) => item.id === genreId);
+                if (!genre) return null;
+                return (
+                  <GenreRow
+                    key={genreId}
+                    genreId={genreId}
+                    genreName={genre.name}
+                    sortBy={sortBy}
+                    highlighted={highlightedGenreId === genreId}
+                    {...favoriteProps}
+                  />
+                );
+              })}
+          </>
+        )}
+      </div>
+    </>
   );
 };
