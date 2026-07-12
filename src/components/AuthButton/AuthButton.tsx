@@ -33,7 +33,7 @@ export const AuthButton: React.FC = () => {
             )
         }
       >
-        Iniciar sesion con Google
+        <span className={styles.signInLabel}>Iniciar sesion con Google</span>
       </Button>
     );
   }

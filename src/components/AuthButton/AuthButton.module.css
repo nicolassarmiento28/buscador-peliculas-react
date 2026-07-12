@@ -28,4 +28,8 @@
   .userName {
     display: none;
   }
+
+  .signInLabel {
+    display: none;
+  }
 }
