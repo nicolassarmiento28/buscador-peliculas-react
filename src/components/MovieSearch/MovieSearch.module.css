@@ -11,27 +11,6 @@
   min-height: 400px;
 }
 
-.themeToggle {
-  position: absolute !important;
-  top: 24px;
-  right: 24px;
-  z-index: 10;
-}
-
-.favoritesButtonBadge {
-  position: absolute;
-  top: 24px;
-  left: 24px;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.favoritesButton {
-  border-radius: 16px !important;
-}
-
 /* Titulo editorial: serif Playfair Display + degrade ambar -> ciruela
    secundario via background-clip. El fallback (sin soporte de
    background-clip: text) deja el color solido --accent, que ya cumple
@@ -154,16 +133,6 @@
     margin: 12px auto;
     padding: 16px;
     border-radius: 20px;
-  }
-
-  .themeToggle {
-    top: 12px;
-    right: 12px;
-  }
-
-  .favoritesButtonBadge {
-    top: 12px;
-    left: 12px;
   }
 
   .title {

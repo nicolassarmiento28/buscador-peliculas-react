@@ -6,6 +6,7 @@ import { MovieSearch } from './components/MovieSearch/MovieSearch';
 import { MyList } from './components/MyList/MyList';
 import { PublicList } from './components/PublicList/PublicList';
 import { WelcomeCurtain } from './components/WelcomeCurtain/WelcomeCurtain';
+import { Header } from './components/Header/Header';
 import './styles/global.css';
 
 const rootElement = document.getElementById('root');
@@ -18,6 +19,7 @@ createRoot(rootElement).render(
   <StrictMode>
     <ThemeProvider>
       <WelcomeCurtain />
+      <Header />
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<MovieSearch />} />

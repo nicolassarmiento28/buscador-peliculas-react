@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
 import {
   Input,
   Button,
@@ -10,14 +9,7 @@ import {
   Alert,
   Pagination,
 } from 'antd';
-import {
-  SearchOutlined,
-  BulbOutlined,
-  BulbFilled,
-  VideoCameraOutlined,
-  HeartOutlined,
-} from '@ant-design/icons';
-import { useTheme } from '../../hooks/useTheme';
+import { SearchOutlined, VideoCameraOutlined } from '@ant-design/icons';
 import { useAuth } from '../../hooks/useAuth';
 import { useMyList } from '../../hooks/useMyList';
 import {
@@ -28,7 +20,6 @@ import {
 import { MovieCard } from '../MovieCard/MovieCard';
 import { TrendingSection } from '../TrendingSection/TrendingSection';
 import { GenreChips } from '../GenreChips/GenreChips';
-import { AuthButton } from '../AuthButton/AuthButton';
 import type { Movie, SortBy } from '../../types/movies';
 import styles from './MovieSearch.module.css';
 import cardStyles from '../MovieCard/MovieCard.module.css';
@@ -49,7 +40,6 @@ export const MovieSearch: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [trending, setTrending] = useState<Movie[]>([]);
-  const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
   const { isFavorite, isSaving, toggleFavorite } = useMyList(user);
 
@@ -165,29 +155,6 @@ export const MovieSearch: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <Button
-        className={styles.themeToggle}
-        onClick={toggleTheme}
-        icon={theme === 'dark' ? <BulbOutlined /> : <BulbFilled />}
-        shape="circle"
-        size="large"
-        title={`Cambiar a ${theme === 'dark' ? 'light' : 'dark'} mode`}
-        aria-label={`Cambiar a modo ${theme === 'dark' ? 'claro' : 'oscuro'}`}
-      />
-
-      <div className={styles.favoritesButtonBadge}>
-        <AuthButton />
-        <Link to="/mi-lista">
-          <Button
-            className={styles.favoritesButton}
-            icon={<HeartOutlined />}
-            size="large"
-          >
-            Mi lista
-          </Button>
-        </Link>
-      </div>
-
       <Title level={1} className={styles.title}>
         Buscador de Películas
       </Title>
