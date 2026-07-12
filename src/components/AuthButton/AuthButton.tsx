@@ -1,7 +1,13 @@
 import React from 'react';
 import { Avatar, Button, Dropdown } from 'antd';
 import { GoogleOutlined } from '@ant-design/icons';
-import { GoogleAuthProvider, signInWithRedirect, signOut } from 'firebase/auth';
+import {
+  GoogleAuthProvider,
+  browserLocalPersistence,
+  setPersistence,
+  signInWithRedirect,
+  signOut,
+} from 'firebase/auth';
 import { auth } from '../../services/firebase';
 import { useAuth } from '../../hooks/useAuth';
 import styles from './AuthButton.module.css';
@@ -20,9 +26,11 @@ export const AuthButton: React.FC = () => {
         icon={<GoogleOutlined />}
         size="large"
         onClick={() =>
-          signInWithRedirect(auth, new GoogleAuthProvider()).catch((error) =>
-            console.error('Error al iniciar sesion con Google:', error)
-          )
+          setPersistence(auth, browserLocalPersistence)
+            .then(() => signInWithRedirect(auth, new GoogleAuthProvider()))
+            .catch((error) =>
+              console.error('Error al iniciar sesion con Google:', error)
+            )
         }
       >
         Iniciar sesion con Google
