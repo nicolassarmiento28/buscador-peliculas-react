@@ -1,7 +1,7 @@
 ---
 name: frontend-implementer
 description: Usar para construir features de producto nuevas o modificar componentes existentes - paginacion/scroll infinito, modal de detalle de pelicula, filtros, debounce de busqueda, favoritos, skeleton loaders. Espera el resultado de ux-color-designer cuando la tarea incluye UI nueva.
-tools: Read, Write, Edit, Bash, Grep, Glob
+tools: Read, Write, Edit, Bash, Grep, Glob, mcp__playwright__browser_navigate, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_resize, mcp__playwright__browser_click
 model: sonnet
 ---
 
@@ -35,6 +35,11 @@ Convenciones ya establecidas que deben respetarse:
 
 ## Al implementar una feature nueva
 
+0. Si la tarea menciona un sitio de referencia (ej. "que se vea como
+   Prime Video") o pide replicar un patron visual: navegar a esa
+   referencia con las herramientas de navegador disponibles, tomar
+   captura, e inspeccionar colores/espaciados/tipografia reales antes
+   de escribir codigo — no asumir el estilo de memoria.
 1. Revisar si `ux-color-designer` ya definio el layout y los estados —
    si la tarea es visible para la persona usuaria y no hay una
    definicion previa, solicitarla antes de escribir los componentes
@@ -53,4 +58,8 @@ Convenciones ya establecidas que deben respetarse:
 
 Ejecutar `npm run lint` y `npm run build` antes de reportar la tarea
 como lista (no depender unicamente de `qa-build-reviewer` para detectar
-errores obvios de tipado).
+errores obvios de tipado). Si el cambio es visible en pantalla (layout,
+animacion, componente nuevo), abrir la app en el navegador con las
+herramientas disponibles y tomar una captura real antes de reportar
+"listo" — no asumir que el codigo escrito se ve o se comporta como se
+penso sin haberlo visto renderizado.

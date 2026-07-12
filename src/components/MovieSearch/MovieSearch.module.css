@@ -16,7 +16,7 @@
   margin: 0 auto 48px;
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 48px;
 }
 
 /* Titulo editorial: serif Playfair Display + degrade ambar -> ciruela
@@ -150,6 +150,7 @@
   .feed {
     width: calc(100% - 16px);
     margin: 0 auto 48px;
+    gap: 32px;
   }
 
   .title {
