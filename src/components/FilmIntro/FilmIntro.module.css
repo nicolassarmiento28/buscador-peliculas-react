@@ -1,0 +1,50 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1100;
+  background: var(--film-bg);
+  animation:
+    film-flicker 225ms ease-in-out 2,
+    film-fadeout 1000ms ease-out 450ms forwards;
+}
+
+.overlay::before,
+.overlay::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 32px;
+  background-color: var(--film-hole);
+  background-image: radial-gradient(
+    circle at 10px 16px,
+    var(--film-bg) 6px,
+    var(--film-hole) 7px
+  );
+  background-size: 34px 32px;
+  background-repeat: repeat-x;
+}
+.overlay::before {
+  top: 0;
+}
+.overlay::after {
+  bottom: 0;
+}
+
+@keyframes film-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.85;
+  }
+}
+@keyframes film-fadeout {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}

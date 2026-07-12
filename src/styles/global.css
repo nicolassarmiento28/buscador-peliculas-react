@@ -28,12 +28,10 @@
   --overlay-scrim: rgba(26, 14, 30, 0.78);
   --overlay-scrim-border: rgba(246, 239, 228, 0.18);
 
-  --curtain-color: var(--accent-secondary);
-  --curtain-duration: 900ms;
-  --curtain-delay: 400ms;
-  --curtain-easing: cubic-bezier(0.65, 0, 0.35, 1);
   --grain-opacity: 0.035;
   --drift-duration: 60s;
+  --film-bg: #0d0710;
+  --film-hole: rgba(0, 0, 0, 0.55);
 }
 
 [data-theme='light'] {

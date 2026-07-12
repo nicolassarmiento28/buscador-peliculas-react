@@ -5,7 +5,7 @@ import { ThemeProvider } from './providers/ThemeProvider';
 import { MovieSearch } from './components/MovieSearch/MovieSearch';
 import { MyList } from './components/MyList/MyList';
 import { PublicList } from './components/PublicList/PublicList';
-import { WelcomeCurtain } from './components/WelcomeCurtain/WelcomeCurtain';
+import { FilmIntro } from './components/FilmIntro/FilmIntro';
 import { Header } from './components/Header/Header';
 import './styles/global.css';
 
@@ -18,7 +18,7 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <ThemeProvider>
-      <WelcomeCurtain />
+      <FilmIntro />
       <Header />
       <BrowserRouter>
         <Routes>
