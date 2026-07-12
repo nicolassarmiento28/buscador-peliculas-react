@@ -1,0 +1,56 @@
+.section {
+  margin-bottom: 28px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 2.5vw, 1.6rem);
+  font-weight: 700;
+  color: var(--text-main);
+  margin: 0 0 16px;
+}
+
+.track {
+  position: relative;
+}
+
+.row {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+}
+
+.row::-webkit-scrollbar {
+  display: none;
+}
+
+.item {
+  flex: 0 0 160px;
+  scroll-snap-align: start;
+  transition: transform 0.22s ease;
+}
+
+@media (min-width: 768px) {
+  .item {
+    flex-basis: 200px;
+  }
+}
+
+.item:hover,
+.item:focus-within {
+  transform: scale(1.07);
+  z-index: 5;
+}
+
+.fade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 4px;
+  width: 56px;
+  background: linear-gradient(to right, transparent, var(--bg-primary));
+  pointer-events: none;
+}

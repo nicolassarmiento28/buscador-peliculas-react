@@ -4,7 +4,7 @@ import { Row, Col, Empty, Button } from 'antd';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { MovieCard } from '../MovieCard/MovieCard';
-import { TrendingSection } from '../TrendingSection/TrendingSection';
+import { MovieCarousel } from '../MovieCarousel/MovieCarousel';
 import { getMovieRecommendations } from '../../services/movieApi';
 import type { Movie } from '../../types/movies';
 import styles from './PublicList.module.css';
@@ -123,7 +123,7 @@ export const PublicList: React.FC = () => {
         ))}
       </Row>
 
-      <TrendingSection
+      <MovieCarousel
         movies={recommendations}
         isFavorite={() => false}
         onToggleFavorite={() => {}}

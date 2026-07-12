@@ -1,47 +1,32 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Input,
-  Button,
-  Row,
-  Col,
-  Typography,
-  Empty,
-  Alert,
-  Pagination,
-} from 'antd';
-import { SearchOutlined, VideoCameraOutlined } from '@ant-design/icons';
+import { Input, Button, Typography, Alert } from 'antd';
+import { SearchOutlined } from '@ant-design/icons';
 import { useAuth } from '../../hooks/useAuth';
 import { useMyList } from '../../hooks/useMyList';
-import {
-  searchMovies,
-  getTrending,
-  discoverByGenre,
-} from '../../services/movieApi';
-import { MovieCard } from '../MovieCard/MovieCard';
-import { TrendingSection } from '../TrendingSection/TrendingSection';
+import { useFirstListMovieId } from '../../hooks/useFirstListMovieId';
+import { getTrending } from '../../services/movieApi';
+import { MovieCarousel } from '../MovieCarousel/MovieCarousel';
 import { GenreChips } from '../GenreChips/GenreChips';
+import { GenreRow, RecommendedRow, SearchRow } from './MovieRows';
+import { GENRES } from '../../constants/genres';
 import type { Movie, SortBy } from '../../types/movies';
 import styles from './MovieSearch.module.css';
-import cardStyles from '../MovieCard/MovieCard.module.css';
 
 const { Title } = Typography;
 const { Search } = Input;
 
 const DEBOUNCE_MS = 450;
-const SKELETON_COUNT = 8;
 
 export const MovieSearch: React.FC = () => {
   const [query, setQuery] = useState<string>('');
-  const [activeGenreId, setActiveGenreId] = useState<number | null>(null);
+  const [debouncedQuery, setDebouncedQuery] = useState<string>('');
+  const [activeGenreIds, setActiveGenreIds] = useState<number[]>([]);
   const [sortBy, setSortBy] = useState<SortBy>('popularity.desc');
-  const [page, setPage] = useState<number>(1);
-  const [movies, setMovies] = useState<Movie[]>([]);
-  const [totalPages, setTotalPages] = useState<number>(0);
-  const [loading, setLoading] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [trending, setTrending] = useState<Movie[]>([]);
   const { user } = useAuth();
   const { isFavorite, isSaving, toggleFavorite } = useMyList(user);
+  const firstListMovieId = useFirstListMovieId(user);
 
   useEffect(() => {
     getTrending()
@@ -51,107 +36,32 @@ export const MovieSearch: React.FC = () => {
       );
   }, []);
 
-  const runSearch = async (value: string, targetPage: number) => {
-    if (!value.trim()) {
-      setMovies([]);
-      setTotalPages(0);
-      return;
-    }
-
-    setErrorMessage(null);
-    setLoading(true);
-    try {
-      const { movies: results, totalPages: pages } = await searchMovies(
-        value,
-        targetPage
-      );
-      setMovies(results);
-      setTotalPages(pages);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Error inesperado al buscar peliculas.';
-      setErrorMessage(message);
-      setMovies([]);
-      setTotalPages(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const runDiscover = async (
-    genreId: number,
-    sort: SortBy,
-    targetPage: number
-  ) => {
-    setErrorMessage(null);
-    setLoading(true);
-    try {
-      const { movies: results, totalPages: pages } = await discoverByGenre(
-        genreId,
-        sort,
-        targetPage
-      );
-      setMovies(results);
-      setTotalPages(pages);
-    } catch (error) {
-      const message =
-        error instanceof Error
-          ? error.message
-          : 'Error inesperado al buscar peliculas.';
-      setErrorMessage(message);
-      setMovies([]);
-      setTotalPages(0);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Busqueda con debounce al tipear; reinicia a pagina 1 en cada cambio de query.
+  // Busqueda con debounce al tipear.
   useEffect(() => {
-    if (activeGenreId !== null) {
-      return;
-    }
     const timer = setTimeout(() => {
-      setPage(1);
-      runSearch(query, 1);
+      setErrorMessage(null);
+      setDebouncedQuery(query.trim());
     }, DEBOUNCE_MS);
 
     return () => clearTimeout(timer);
-  }, [query, activeGenreId]);
+  }, [query]);
 
-  const handleSearch = (value: string) => {
-    setActiveGenreId(null);
-    setPage(1);
-    runSearch(value, 1);
+  const handleToggleGenre = (genreId: number) => {
+    setActiveGenreIds((prev) =>
+      prev.includes(genreId)
+        ? prev.filter((id) => id !== genreId)
+        : [...prev, genreId]
+    );
   };
 
-  const handlePageChange = (nextPage: number) => {
-    setPage(nextPage);
-    if (activeGenreId !== null) {
-      runDiscover(activeGenreId, sortBy, nextPage);
-    } else {
-      runSearch(query, nextPage);
-    }
+  const favoriteProps = {
+    isFavorite,
+    onToggleFavorite: toggleFavorite,
+    authRequired: !user,
+    isSaving,
   };
 
-  const handleSelectGenre = (genreId: number) => {
-    setQuery('');
-    setActiveGenreId(genreId);
-    setPage(1);
-    runDiscover(genreId, sortBy, 1);
-  };
-
-  const handleSortChange = (nextSortBy: SortBy) => {
-    setSortBy(nextSortBy);
-    if (activeGenreId !== null) {
-      setPage(1);
-      runDiscover(activeGenreId, nextSortBy, 1);
-    }
-  };
-
-  const isBrowsing = !query.trim() && activeGenreId === null;
+  const isSearching = debouncedQuery.length > 0;
 
   return (
     <div className={styles.container}>
@@ -171,18 +81,16 @@ export const MovieSearch: React.FC = () => {
           size="large"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          onSearch={handleSearch}
-          loading={loading}
           className={styles.searchInput}
           aria-label="Buscar película por título"
         />
       </div>
 
       <GenreChips
-        activeGenreId={activeGenreId}
+        activeGenreIds={activeGenreIds}
         sortBy={sortBy}
-        onSelectGenre={handleSelectGenre}
-        onSortChange={handleSortChange}
+        onSelectGenre={handleToggleGenre}
+        onSortChange={setSortBy}
       />
 
       {errorMessage ? (
@@ -195,68 +103,38 @@ export const MovieSearch: React.FC = () => {
         />
       ) : null}
 
-      {isBrowsing ? (
-        <TrendingSection
-          movies={trending}
-          isFavorite={isFavorite}
-          onToggleFavorite={toggleFavorite}
-          authRequired={!user}
-          isSaving={isSaving}
-        />
-      ) : null}
-
-      {loading ? (
-        <Row gutter={[22, 22]} className={styles.skeletonList}>
-          {Array.from({ length: SKELETON_COUNT }).map((_, index) => (
-            <Col key={index} xs={24} sm={12} md={8} lg={6} xl={6}>
-              <div className={cardStyles.skeletonCard}>
-                <div className={cardStyles.skeletonPoster} />
-                <div className={cardStyles.skeletonLine} />
-                <div className={cardStyles.skeletonLine} />
-              </div>
-            </Col>
-          ))}
-        </Row>
-      ) : movies.length > 0 ? (
-        <>
-          <Row gutter={[22, 22]} className={styles.movieList}>
-            {movies.map((movie) => (
-              <Col key={movie.id} xs={24} sm={12} md={8} lg={6} xl={6}>
-                <MovieCard
-                  movie={movie}
-                  isFavorite={isFavorite(movie.id)}
-                  onToggleFavorite={toggleFavorite}
-                  authRequired={!user}
-                  saving={isSaving(movie.id)}
-                />
-              </Col>
-            ))}
-          </Row>
-          {totalPages > 1 ? (
-            <Pagination
-              current={page}
-              total={Math.min(totalPages, 500)}
-              pageSize={1}
-              onChange={handlePageChange}
-              className={styles.pagination}
-              showSizeChanger={false}
-            />
-          ) : null}
-        </>
-      ) : query || activeGenreId !== null ? (
-        <Empty
-          description="No se encontraron películas"
-          className={styles.empty}
+      {isSearching ? (
+        <SearchRow
+          query={debouncedQuery}
+          onError={setErrorMessage}
+          {...favoriteProps}
         />
       ) : (
-        <div className={styles.emptyState}>
-          <VideoCameraOutlined className={styles.emptyStateIcon} />
-          <p className={styles.emptyStateTitle}>Empieza tu búsqueda</p>
-          <p className={styles.emptyStateText}>
-            Escribe el título de una película para descubrir su información en
-            TMDb.
-          </p>
-        </div>
+        <>
+          <MovieCarousel
+            movies={trending}
+            title="En tendencia hoy"
+            {...favoriteProps}
+          />
+
+          {user && firstListMovieId ? (
+            <RecommendedRow movieId={firstListMovieId} {...favoriteProps} />
+          ) : null}
+
+          {activeGenreIds.map((genreId) => {
+            const genre = GENRES.find((item) => item.id === genreId);
+            if (!genre) return null;
+            return (
+              <GenreRow
+                key={genreId}
+                genreId={genreId}
+                genreName={genre.name}
+                sortBy={sortBy}
+                {...favoriteProps}
+              />
+            );
+          })}
+        </>
       )}
     </div>
   );
