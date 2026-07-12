@@ -2,10 +2,19 @@
   position: fixed;
   inset: 0;
   z-index: 1100;
-  background: var(--film-bg);
+  cursor: pointer;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"),
+    radial-gradient(
+      ellipse at center,
+      rgba(13, 7, 16, 0.15) 0%,
+      rgba(13, 7, 16, 0.55) 62%,
+      var(--film-bg) 100%
+    );
+  background-blend-mode: overlay, normal;
   animation:
     film-flicker 225ms ease-in-out 2,
-    film-fadeout 1000ms ease-out 450ms forwards;
+    film-fadeout 900ms ease-out 400ms forwards;
 }
 
 .overlay::before,
@@ -31,6 +40,21 @@
   bottom: 0;
 }
 
+.skipping {
+  animation: film-fadeout-fast 350ms ease-out forwards !important;
+}
+
+.skipHint {
+  position: absolute;
+  bottom: 16px;
+  right: 20px;
+  font-family: 'Inter', sans-serif;
+  font-size: 12px;
+  color: var(--text-main);
+  opacity: 0.55;
+  pointer-events: none;
+}
+
 @keyframes film-flicker {
   0%,
   100% {
@@ -46,5 +70,14 @@
   }
   to {
     opacity: 0;
+  }
+}
+@keyframes film-fadeout-fast {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    visibility: hidden;
   }
 }
