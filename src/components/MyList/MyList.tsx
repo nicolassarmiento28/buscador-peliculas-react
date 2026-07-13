@@ -11,6 +11,7 @@ import { db } from '../../services/firebase';
 import { useAuth } from '../../hooks/useAuth';
 import { useMyList } from '../../hooks/useMyList';
 import { MovieCard } from '../MovieCard/MovieCard';
+import { AuthButton } from '../AuthButton/AuthButton';
 import type { Movie } from '../../types/movies';
 import styles from './MyList.module.css';
 
@@ -29,12 +30,6 @@ export const MyList: React.FC = () => {
   const [items, setItems] = useState<MyListItem[]>([]);
   const [isPublic, setIsPublic] = useState(false);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (loading || user) return;
-    message.info('Inicia sesion para ver tu lista');
-    navigate('/');
-  }, [user, loading, navigate]);
 
   useEffect(() => {
     if (!user) return;
@@ -84,8 +79,27 @@ export const MyList: React.FC = () => {
       .catch((error) => console.error('Error copiando el link:', error));
   };
 
-  if (loading || !user) {
+  if (loading) {
     return null;
+  }
+
+  if (!user) {
+    return (
+      <div className={styles.container}>
+        <Button
+          shape="circle"
+          icon={<ArrowLeftOutlined />}
+          aria-label="Volver a la pagina principal"
+          onClick={() => navigate('/')}
+        />
+        <div className={styles.emptyState}>
+          <Text className={styles.emptyText}>
+            Inicia sesión para ver tu lista de películas
+          </Text>
+          <AuthButton />
+        </div>
+      </div>
+    );
   }
 
   const movies: Movie[] = items.map((item) => ({

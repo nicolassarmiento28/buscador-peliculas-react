@@ -3,13 +3,11 @@ import { Link } from 'react-router-dom';
 import { Button } from 'antd';
 import { HeartOutlined, BulbOutlined, BulbFilled } from '@ant-design/icons';
 import { useTheme } from '../../hooks/useTheme';
-import { useAuth } from '../../hooks/useAuth';
 import { AuthButton } from '../AuthButton/AuthButton';
 import styles from './Header.module.css';
 
 export const Header: React.FC = () => {
   const { theme, toggleTheme } = useTheme();
-  const { user } = useAuth();
 
   return (
     <header className={styles.header}>
@@ -17,13 +15,11 @@ export const Header: React.FC = () => {
         Buscador de Películas
       </Link>
       <div className={styles.rightGroup}>
-        {user ? (
-          <Link to="/mi-lista">
-            <Button icon={<HeartOutlined />} size="large">
-              <span className={styles.labelText}>Mi lista</span>
-            </Button>
-          </Link>
-        ) : null}
+        <Link to="/mi-lista">
+          <Button icon={<HeartOutlined />} size="large">
+            <span className={styles.labelText}>Mi lista</span>
+          </Button>
+        </Link>
         <AuthButton />
         <Button
           onClick={toggleTheme}
