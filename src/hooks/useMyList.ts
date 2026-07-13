@@ -17,10 +17,12 @@ interface ListItemDoc {
   movieId: number;
 }
 
-// ponytail: shareSlug generado con crypto.randomUUID().slice(0, 8), no hace
-// falta un generador de slugs dedicado para un identificador que solo debe
-// ser unico y url-safe.
-const createShareSlug = (): string => crypto.randomUUID().slice(0, 8);
+// ponytail: shareSlug generado con crypto.randomUUID().slice(0, 12) (48 bits
+// de entropia), no hace falta un generador de slugs dedicado para un
+// identificador que solo debe ser unico y url-safe. Listas existentes con
+// slug de 8 chars siguen funcionando (el campo es string libre, sin
+// validacion de longitud en firestore.rules).
+const createShareSlug = (): string => crypto.randomUUID().slice(0, 12);
 
 interface UseMyListResult {
   shareSlug: string | null;
