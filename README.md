@@ -1,107 +1,111 @@
-# Aplicación de Búsqueda de Películas
+# Buscador de Peliculas
 
-Aplicación web desarrollada con React para búsqueda y exploración de películas mediante consumo de la API de The Movie Database (TMDb). El proyecto fue migrado de JavaScript a TypeScript y actualmente utiliza React, Vite y Ant Design para construir una interfaz moderna, responsive y enfocada en experiencia de usuario.
-
-La aplicación incluye renderizado dinámico de resultados, manejo de estado y visualización organizada de información para facilitar la búsqueda y exploración de contenido en tiempo real.
-
+Aplicacion web para buscar y explorar peliculas usando la API de TMDb (The Movie Database), con favoritos, tema claro/oscuro y listas de peliculas compartibles (Firebase Auth + Firestore).
 
 ## Caracteristicas
 
-- Busqueda de peliculas en tiempo real
-- Tema claro/oscuro con persistencia en localStorage
-- Interfaz responsiva para movil, tablet y desktop
-- Tipado fuerte con TypeScript
-- Componentes de UI con Ant Design
+- Home con peliculas en tendencia, carruseles por categoria y chips de genero (multi-select + orden por popularidad/valoracion/fecha).
+- Busqueda de peliculas en tiempo real.
+- Favoritos por pelicula y detalle en modal.
+- Login con Google (Firebase Auth) y lista personal guardable, con opcion de compartirla publicamente via link.
+- Tema claro/oscuro con persistencia en localStorage.
+- Interfaz responsiva, con Ant Design.
 
 ## Stack
 
-- React 19
-- TypeScript 6
+- React 19 + TypeScript 6
 - Vite 7
 - Ant Design 6
+- React Router 7
+- Firebase 12 (Auth + Firestore)
 - ESLint + Prettier
+
+## Arquitectura
+
+El cliente nunca llama a TMDb directamente ni conoce su token. Toda la logica de peliculas pasa por `src/services/movieApi.ts`, que llama a funciones serverless propias en `api/` (`api/search.ts`, `api/movies.ts`). Estas funciones corren en Vercel, guardan el token `TMDB_API_TOKEN` solo del lado del servidor, validan los parametros de entrada, y son las unicas que hablan con `api.themoviedb.org`.
+
+Los favoritos y las listas compartibles usan Firebase: Auth (Google, via redirect) y Firestore (una lista por usuario, con un campo `shareSlug` para el link publico y reglas de seguridad en `firestore.rules`).
 
 ## Requisitos
 
 - Node.js 18 o superior
 - npm
+- Cuenta de Vercel (o Vercel CLI) si se quiere correr `/api/*` localmente
 
-## Instalacion
+## Instalacion y uso local
 
 ```bash
 npm install
 ```
 
-## Configuracion de entorno
-
-El token de TMDb se usa solo del lado del servidor, en la funcion
-serverless `api/search.ts`, para que nunca quede expuesto en el bundle
-del cliente.
-
-1. Crea o edita el archivo `.env.local` en la raiz del proyecto (usado por
-   `vercel dev`) o configura la variable en el entorno de Vercel
-   (Project Settings > Environment Variables) para produccion.
-2. Define tu token de TMDb (sin prefijo `VITE_`):
+Copia `.env.example` a `.env.local` y completa las variables:
 
 ```env
-TMDB_API_TOKEN=tu_token_aqui
+TMDB_API_TOKEN=tu_token_de_tmdb
+
+VITE_FIREBASE_API_KEY=...
+VITE_FIREBASE_AUTH_DOMAIN=...
+VITE_FIREBASE_PROJECT_ID=...
+VITE_FIREBASE_STORAGE_BUCKET=...
+VITE_FIREBASE_MESSAGING_SENDER_ID=...
+VITE_FIREBASE_APP_ID=...
 ```
 
-Puedes usar `.env.example` como referencia. El cliente llama a
-`/api/search` (mismo origen) en vez de llamar a TMDb directamente.
+Nota: `TMDB_API_TOKEN` NO lleva prefijo `VITE_` (es solo server-side). Las variables `VITE_FIREBASE_*` son la config publica de Firebase.
+
+```bash
+npm run dev
+```
+
+Abre `http://localhost:5173/`.
+
+**Importante**: `npm run dev` levanta solo el frontend (Vite). Las rutas `/api/search` y `/api/movies` son funciones serverless de Vercel y NO funcionan con `vite dev` solo — para probarlas localmente hace falta `vercel dev` (que sirve tanto el frontend como las funciones de `api/`).
 
 ## Scripts disponibles
 
 ```bash
-npm run dev           # Desarrollo
-npm run build         # Build de produccion (TypeScript + Vite)
-npm run preview       # Preview de la build
-npm run lint          # Linter
-npm run format        # Formatea archivos en src/
-npm run format:check  # Verifica formato
+npm run dev           # Desarrollo (Vite)
+npm run build         # tsc -b && vite build
+npm run lint          # ESLint
+npm run preview       # Preview del build de produccion
+npm run format        # Formatea src/ con Prettier
+npm run format:check  # Verifica formato sin escribir
 ```
-
-## Uso
-
-1. Ejecuta `npm run dev`.
-2. Abre `http://localhost:5173/`.
-3. Escribe una pelicula en el buscador y presiona Enter o el boton Buscar.
-4. Cambia el tema con el boton de la esquina superior derecha.
 
 ## Estructura principal
 
 ```text
 src/
-  components/
-    MovieCard/
-    MovieSearch/
-  contexts/
-    ThemeContext.ts
-  hooks/
-    useTheme.ts
-  providers/
-    ThemeProvider.tsx
-  services/
-    movieApi.ts
-  styles/
-    global.css
-  theme/
-    antdTheme.ts
-  types/
-    movies.ts
+  components/    # MovieCard, MovieSearch, MovieCarousel, GenreChips, MyList, PublicList, Header, Footer, FilmIntro, AuthButton
+  contexts/       # ThemeContext, AuthContext
+  hooks/          # useTheme, useAuth, useMyList, useFirstListMovieId
+  providers/      # ThemeProvider, AuthProvider
+  services/       # movieApi.ts (cliente /api/*), firebase.ts
+  styles/         # global.css (paleta "Marquesina")
+  theme/          # antdTheme.ts
+  types/          # movies.ts
+  constants/      # genres.ts
   main.tsx
+api/
+  search.ts       # proxy serverless a /search/movie
+  movies.ts       # proxy serverless multi-endpoint (trending, top_rated, upcoming, discover, credits, videos, recommendations)
+firestore.rules
 ```
 
-## Notas importantes
+## Demo
 
-- La app consume `https://api.themoviedb.org/3/search/movie`.
-- El token se lee desde `import.meta.env.VITE_TMDB_API_TOKEN` en `src/services/movieApi.ts`.
-- Existe un respaldo del componente anterior en `src/BuscadorPeliculas.jsx.backup`.
+[agregar URL de demo]
+
+## Sobre el desarrollo
+
+Parte del desarrollo de este proyecto se apoyo en una arquitectura de subagentes de Claude Code (diseño, implementacion, seguridad y QA), con verificacion visual real via Playwright en los pasos de UI y de QA final.
 
 ## Documentacion relacionada
 
+- `CLAUDE.md` / `AGENTS.md`: contexto detallado del proyecto para agentes de codigo.
 - `INSTRUCCIONES_USO.md`: guia rapida de uso diario.
-- `MIGRATION.md`: detalles de la migracion de JavaScript a TypeScript.
+
+El proyecto arranco en JavaScript y se migro a TypeScript + Ant Design en una etapa temprana (antes de Firebase, el proxy serverless y los carruseles); ese historico ya no vive en un archivo aparte.
 
 ## Troubleshooting
 
@@ -111,4 +115,4 @@ src/
 npm run dev -- --port 3000
 ```
 
-- Si falla la API, verifica que `VITE_TMDB_API_TOKEN` exista y sea valido.
+- Si falla la carga de peliculas, verifica que `TMDB_API_TOKEN` este configurado (en `.env.local` para `vercel dev`, o en las variables de entorno del proyecto en Vercel para produccion).
