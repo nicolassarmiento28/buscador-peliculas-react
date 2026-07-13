@@ -35,22 +35,22 @@
 }
 
 [data-theme='light'] {
-  --panel-bg: rgba(255, 251, 244, 0.88);
-  --panel-border: rgba(43, 23, 48, 0.12);
-  --text-main: #2b1730;
-  --text-muted: rgba(43, 23, 48, 0.7);
+  --panel-bg: rgba(218, 203, 168, 0.55);
+  --panel-border: rgba(61, 43, 31, 0.14);
+  --text-main: #3d2b1f;
+  --text-muted: rgba(61, 43, 31, 0.66);
   --accent: #cf8a22;
   --accent-hover: #b5761a;
   --accent-secondary: #5a2a4d;
-  /* Mismo motivo que en oscuro: texto ciruela sobre acento ambar (ratio
-     ~5.1:1) en vez de blanco (ratio ~3.2:1, no pasa AA para texto normal). */
-  --accent-text-on: #2b1730;
+  /* Mismo motivo que en oscuro: texto sepia sobre acento ambar en vez de
+     blanco, ya validado por ux-color-designer para contraste AA. */
+  --accent-text-on: #3d2b1f;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.15);
-  --bg-primary: #f6efe4;
+  --bg-primary: #e8dcc3;
   --bg-gradient: linear-gradient(
     180deg,
-    rgba(255, 255, 255, 0.3),
-    rgba(246, 239, 228, 0.6)
+    rgba(232, 162, 58, 0.06),
+    rgba(232, 162, 58, 0.12)
   );
   --overlay-scrim: rgba(26, 14, 30, 0.78);
   --overlay-scrim-border: rgba(246, 239, 228, 0.18);
@@ -84,6 +84,9 @@ body {
   position: relative;
   z-index: 0;
   padding-top: 64px;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 /* Fondo ambiente: parallax lento + grano de pelicula, sobre la base

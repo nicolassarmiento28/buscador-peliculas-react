@@ -8,6 +8,7 @@ import { MyList } from './components/MyList/MyList';
 import { PublicList } from './components/PublicList/PublicList';
 import { FilmIntro } from './components/FilmIntro/FilmIntro';
 import { Header } from './components/Header/Header';
+import { Footer } from './components/Footer/Footer';
 import './styles/global.css';
 
 const rootElement = document.getElementById('root');
@@ -23,11 +24,14 @@ createRoot(rootElement).render(
         <FilmIntro />
         <BrowserRouter>
           <Header />
-          <Routes>
-            <Route path="/" element={<MovieSearch />} />
-            <Route path="/mi-lista" element={<MyList />} />
-            <Route path="/lista/:shareSlug" element={<PublicList />} />
-          </Routes>
+          <main style={{ flex: 1 }}>
+            <Routes>
+              <Route path="/" element={<MovieSearch />} />
+              <Route path="/mi-lista" element={<MyList />} />
+              <Route path="/lista/:shareSlug" element={<PublicList />} />
+            </Routes>
+          </main>
+          <Footer />
         </BrowserRouter>
       </AuthProvider>
     </ThemeProvider>
