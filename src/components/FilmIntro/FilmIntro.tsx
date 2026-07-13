@@ -4,19 +4,27 @@ import styles from './FilmIntro.module.css';
 
 const STORAGE_KEY = 'film-intro-shown';
 
+// Guard a nivel de modulo: sessionStorage por si solo ya evita que se
+// repita entre recargas, pero esto ademas bloquea cualquier segundo
+// montaje dentro de la MISMA carga de pagina (ej. un remount inesperado
+// del arbol), marcando la bandera de forma sincronica antes de que el
+// primer montaje siquiera termine de renderizar.
+let hasPlayedThisPageLoad = false;
+
 export const FilmIntro: FC = () => {
   const [visible, setVisible] = useState(() => {
+    if (hasPlayedThisPageLoad) return false;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return false;
     }
-    return !sessionStorage.getItem(STORAGE_KEY);
+    if (sessionStorage.getItem(STORAGE_KEY)) return false;
+
+    hasPlayedThisPageLoad = true;
+    sessionStorage.setItem(STORAGE_KEY, '1');
+    return true;
   });
   const [skipping, setSkipping] = useState(false);
   const overlayRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (visible) sessionStorage.setItem(STORAGE_KEY, '1');
-  }, [visible]);
 
   useEffect(() => {
     if (visible) overlayRef.current?.focus();
