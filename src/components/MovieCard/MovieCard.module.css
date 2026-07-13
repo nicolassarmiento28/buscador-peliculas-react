@@ -27,9 +27,10 @@
 
 .movieCard :global(.ant-card-meta-description) {
   display: -webkit-box;
-  -webkit-line-clamp: 4;
+  -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  min-height: calc(1.5714em * 3);
 }
 
 .movieCard:hover {

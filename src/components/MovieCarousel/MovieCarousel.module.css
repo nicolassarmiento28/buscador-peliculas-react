@@ -1,5 +1,6 @@
 .section {
   margin-bottom: 0;
+  padding: 0 28px;
 }
 
 .section.highlight {
@@ -43,9 +44,25 @@
   scrollbar-width: none;
 }
 
+@media (min-width: 768px) and (max-width: 1024px) {
+  .section {
+    padding: 0 24px;
+  }
+}
+
 @media (max-width: 600px) {
   .row {
     gap: 14px;
+  }
+
+  .section {
+    padding: 0 16px;
+  }
+}
+
+@media (max-width: 380px) {
+  .section {
+    padding: 0 14px;
   }
 }
 
@@ -55,6 +72,7 @@
 
 .item {
   flex: 0 0 160px;
+  min-width: 0;
   scroll-snap-align: start;
   transition: transform 0.22s ease;
 }
@@ -69,6 +87,48 @@
 .item:focus-within {
   transform: scale(1.07);
   z-index: 5;
+}
+
+.arrow {
+  position: absolute;
+  top: 50%;
+  z-index: 6;
+  transform: translateY(-50%);
+  width: 40px !important;
+  height: 40px !important;
+  border: 1px solid var(--panel-border) !important;
+  background: var(--panel-bg) !important;
+  backdrop-filter: blur(12px);
+  color: var(--accent) !important;
+  box-shadow: var(--shadow);
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease;
+}
+
+.arrow:hover:not(:disabled) {
+  border-color: var(--accent) !important;
+  transform: translateY(-50%) scale(1.06);
+}
+
+.arrow:disabled {
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+.arrowLeft {
+  left: 4px;
+}
+
+.arrowRight {
+  right: 4px;
+}
+
+@media (max-width: 600px) {
+  .arrow {
+    width: 32px !important;
+    height: 32px !important;
+  }
 }
 
 .fade {

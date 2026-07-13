@@ -12,8 +12,8 @@
 }
 
 .feed {
-  width: min(1120px, calc(100% - 32px));
-  margin: 0 auto 48px;
+  width: 100%;
+  margin: 0 0 48px;
   display: flex;
   flex-direction: column;
   gap: 48px;
@@ -148,8 +148,6 @@
   }
 
   .feed {
-    width: calc(100% - 16px);
-    margin: 0 auto 48px;
     gap: 32px;
   }
 
@@ -170,11 +168,6 @@
     padding: 24px;
   }
 
-  .feed {
-    width: min(100% - 40px, 920px);
-    margin: 0 auto 48px;
-  }
-
   .title {
     font-size: clamp(2.1rem, 3.2vw, 3rem) !important;
   }
@@ -193,8 +186,4 @@
     padding: 14px;
   }
 
-  .feed {
-    width: calc(100% - 12px);
-    margin: 0 auto 48px;
-  }
 }

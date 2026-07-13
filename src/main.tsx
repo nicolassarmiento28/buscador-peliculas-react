@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from './providers/ThemeProvider';
+import { AuthProvider } from './providers/AuthProvider';
 import { MovieSearch } from './components/MovieSearch/MovieSearch';
 import { MyList } from './components/MyList/MyList';
 import { PublicList } from './components/PublicList/PublicList';
@@ -18,15 +19,17 @@ if (!rootElement) {
 createRoot(rootElement).render(
   <StrictMode>
     <ThemeProvider>
-      <FilmIntro />
-      <Header />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<MovieSearch />} />
-          <Route path="/mi-lista" element={<MyList />} />
-          <Route path="/lista/:shareSlug" element={<PublicList />} />
-        </Routes>
-      </BrowserRouter>
+      <AuthProvider>
+        <FilmIntro />
+        <Header />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<MovieSearch />} />
+            <Route path="/mi-lista" element={<MyList />} />
+            <Route path="/lista/:shareSlug" element={<PublicList />} />
+          </Routes>
+        </BrowserRouter>
+      </AuthProvider>
     </ThemeProvider>
   </StrictMode>
 );
