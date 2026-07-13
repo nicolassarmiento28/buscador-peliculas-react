@@ -19,6 +19,12 @@
   gap: 48px;
 }
 
+.titleLink {
+  display: block;
+  text-decoration: none;
+  cursor: pointer;
+}
+
 /* Titulo editorial: serif Playfair Display + degrade ambar -> ciruela
    secundario via background-clip. El fallback (sin soporte de
    background-clip: text) deja el color solido --accent, que ya cumple

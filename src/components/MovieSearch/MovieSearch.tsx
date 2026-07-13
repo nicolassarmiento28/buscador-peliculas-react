@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Input, Button, Typography, Alert } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import { useAuth } from '../../hooks/useAuth';
@@ -90,9 +91,11 @@ export const MovieSearch: React.FC = () => {
   return (
     <>
       <div className={styles.header}>
-        <Title level={1} className={styles.title}>
-          Buscador de Películas
-        </Title>
+        <Link to="/" className={styles.titleLink}>
+          <Title level={1} className={styles.title}>
+            Buscador de Películas
+          </Title>
+        </Link>
         <span className={styles.subtitle}>Explora el catálogo de TMDb</span>
 
         <div className={styles.searchContainer}>
