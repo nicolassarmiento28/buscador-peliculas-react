@@ -87,4 +87,3 @@ npm run dev -- --port 3000
 
 - `README.md`: documentacion principal del proyecto (stack, arquitectura, estructura).
 - `CLAUDE.md` / `AGENTS.md`: contexto detallado para agentes de codigo.
-- `MIGRATION.md`: cambios realizados durante la migracion a TypeScript (historico).

@@ -174,4 +174,3 @@ Ver `.env.example`:
 
 - `README.md`: descripcion, arquitectura y como correr el proyecto localmente.
 - `INSTRUCCIONES_USO.md`: guia rapida de uso diario.
-- `MIGRATION.md`: detalles de la migracion de JavaScript a TypeScript (historico).

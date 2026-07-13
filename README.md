@@ -1,118 +1,198 @@
 # Buscador de Peliculas
 
-Aplicacion web para buscar y explorar peliculas usando la API de TMDb (The Movie Database), con favoritos, tema claro/oscuro y listas de peliculas compartibles (Firebase Auth + Firestore).
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
+![Ant Design](https://img.shields.io/badge/Ant%20Design-6-0170FE?logo=antdesign&logoColor=white)
+![Firebase](https://img.shields.io/badge/Firebase-12-FFCA28?logo=firebase&logoColor=black)
+
+Aplicacion web para descubrir y buscar peliculas usando la API de TMDb (The
+Movie Database). Permite explorar tendencias y catalogo por genero, guardar
+favoritos, armar una lista personal y compartirla publicamente, todo con
+autenticacion via Google y una interfaz clara/oscura con identidad visual
+propia ("Marquesina").
+
+Demo: [agregar URL de demo]
 
 ## Caracteristicas
 
-- Home con peliculas en tendencia, carruseles por categoria y chips de genero (multi-select + orden por popularidad/valoracion/fecha).
-- Busqueda de peliculas en tiempo real.
-- Favoritos por pelicula y detalle en modal.
-- Login con Google (Firebase Auth) y lista personal guardable, con opcion de compartirla publicamente via link.
-- Tema claro/oscuro con persistencia en localStorage.
-- Interfaz responsiva, con Ant Design.
+- **Home**: peliculas en tendencia, carruseles por categoria (top valoradas,
+  proximos estrenos, etc.) y chips de genero con seleccion multiple + orden
+  por popularidad, valoracion o fecha.
+- **Busqueda** de peliculas por titulo.
+- **Favoritos** por pelicula (icono de corazon) y **detalle** en modal
+  (sinopsis, reparto, videos, recomendaciones).
+- **Login con Google** via Firebase Auth (`signInWithRedirect`, sin popup).
+- **Lista personal** (`/mi-lista`, requiere sesion) guardable y **compartible
+  publicamente** en `/lista/:shareSlug`, con recomendaciones basadas en la
+  primera pelicula de la lista. La lectura publica no requiere login.
+- **Tema claro/oscuro** persistido en `localStorage`.
+- Interfaz responsiva construida con Ant Design 6.
+
+## Seguridad
+
+El cliente **nunca** llama directo a la API de TMDb ni conoce el token: todas
+las peticiones pasan por `src/services/movieApi.ts` hacia funciones
+serverless propias (`/api/search`, `/api/movies`), que:
+
+- Leen `TMDB_API_TOKEN` solo del lado del servidor (`process.env`), nunca
+  expuesto al bundle del cliente.
+- Validan los parametros de entrada (`query` no vacio y <=200 caracteres,
+  `page` entero entre 1 y 1000, `sort_by` contra una whitelist, etc.) antes
+  de reenviar la peticion a TMDb.
+- Devuelven codigos de error explicitos: `400` por parametros invalidos,
+  `500` si falta el token, `502` si falla la peticion a TMDb.
+
+Las reglas de Firestore (`firestore.rules`) restringen cada lista a su
+dueño (lectura/escritura), impiden el borrado del documento y permiten
+lectura publica solo si `isPublic == true`.
 
 ## Stack
 
-- React 19 + TypeScript 6
-- Vite 7
-- Ant Design 6
+- React 19 + TypeScript 6 + Vite 7 (`@vitejs/plugin-react-swc`)
+- Ant Design 6 (UI)
 - React Router 7
 - Firebase 12 (Auth + Firestore)
-- ESLint + Prettier
+- Funciones serverless en `api/` (Vercel, runtime Node)
+- ESLint 9 + Prettier 3
 
 ## Arquitectura
 
-El cliente nunca llama a TMDb directamente ni conoce su token. Toda la logica de peliculas pasa por `src/services/movieApi.ts`, que llama a funciones serverless propias en `api/` (`api/search.ts`, `api/movies.ts`). Estas funciones corren en Vercel, guardan el token `TMDB_API_TOKEN` solo del lado del servidor, validan los parametros de entrada, y son las unicas que hablan con `api.themoviedb.org`.
+`src/main.tsx` define la jerarquia de la app:
 
-Los favoritos y las listas compartibles usan Firebase: Auth (Google, via redirect) y Firestore (una lista por usuario, con un campo `shareSlug` para el link publico y reglas de seguridad en `firestore.rules`).
+```
+ThemeProvider
+  AuthProvider
+    FilmIntro (overlay, una vez por sesion)
+    BrowserRouter
+      Header (fijo)
+      Routes
+        "/"                 -> MovieSearch (home + busqueda)
+        "/mi-lista"         -> MyList (requiere sesion)
+        "/lista/:shareSlug" -> PublicList (lectura publica sin login)
+      Footer
+```
 
-## Requisitos
+Las llamadas a red del cliente van siempre por `src/services/movieApi.ts`
+hacia `/api/search` y `/api/movies` (proxy TMDb) o `src/services/firebase.ts`
+(Auth y Firestore). Los tipos de dominio viven en `src/types/movies.ts`.
 
-- Node.js 18 o superior
-- npm
-- Cuenta de Vercel (o Vercel CLI) si se quiere correr `/api/*` localmente
+### Firestore
+
+Una lista por usuario en `lists/{listId}` (donde `listId` es el `uid` del
+dueño), con campos `ownerId`, `title`, `isPublic`, `shareSlug` (generado con
+`crypto.randomUUID().slice(0, 8)`) y `createdAt`. Las peliculas de la lista
+viven en la subcoleccion `lists/{listId}/items/{itemId}`.
 
 ## Instalacion y uso local
 
 ```bash
+git clone <url-del-repo>
+cd buscador-peliculas-react
 npm install
 ```
 
-Copia `.env.example` a `.env.local` y completa las variables:
-
-```env
-TMDB_API_TOKEN=tu_token_de_tmdb
-
-VITE_FIREBASE_API_KEY=...
-VITE_FIREBASE_AUTH_DOMAIN=...
-VITE_FIREBASE_PROJECT_ID=...
-VITE_FIREBASE_STORAGE_BUCKET=...
-VITE_FIREBASE_MESSAGING_SENDER_ID=...
-VITE_FIREBASE_APP_ID=...
-```
-
-Nota: `TMDB_API_TOKEN` NO lleva prefijo `VITE_` (es solo server-side). Las variables `VITE_FIREBASE_*` son la config publica de Firebase.
+Copiar `.env.example` a `.env.local` y completar las variables (ver tabla
+abajo).
 
 ```bash
 npm run dev
 ```
 
-Abre `http://localhost:5173/`.
+Levanta la app en `http://localhost:5173`.
 
-**Importante**: `npm run dev` levanta solo el frontend (Vite). Las rutas `/api/search` y `/api/movies` son funciones serverless de Vercel y NO funcionan con `vite dev` solo — para probarlas localmente hace falta `vercel dev` (que sirve tanto el frontend como las funciones de `api/`).
+> **Importante**: `npm run dev` solo levanta Vite (el frontend). Las
+> funciones serverless de `api/` (`/api/search`, `/api/movies`) **no**
+> corren con ese comando. Para probarlas localmente hace falta la Vercel
+> CLI:
+>
+> ```bash
+> npx vercel dev
+> ```
+
+### Variables de entorno
+
+| Variable | Uso |
+|---|---|
+| `TMDB_API_TOKEN` | Token de TMDb, solo servidor (usado por `api/`). **Nunca** con prefijo `VITE_`. |
+| `VITE_FIREBASE_API_KEY` | Config publica de Firebase (cliente). |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Config publica de Firebase (cliente). |
+| `VITE_FIREBASE_PROJECT_ID` | Config publica de Firebase (cliente). |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Config publica de Firebase (cliente). |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Config publica de Firebase (cliente). |
+| `VITE_FIREBASE_APP_ID` | Config publica de Firebase (cliente). |
 
 ## Scripts disponibles
 
-```bash
-npm run dev           # Desarrollo (Vite)
-npm run build         # tsc -b && vite build
-npm run lint          # ESLint
-npm run preview       # Preview del build de produccion
-npm run format        # Formatea src/ con Prettier
-npm run format:check  # Verifica formato sin escribir
+| Script | Comando | Descripcion |
+|---|---|---|
+| `npm run dev` | `vite` | Servidor de desarrollo (solo frontend). |
+| `npm run build` | `tsc -b && vite build` | Chequeo de tipos + build de produccion. |
+| `npm run lint` | `eslint .` | Linteo del proyecto. |
+| `npm run preview` | `vite preview` | Sirve el build de produccion localmente. |
+| `npm run format` | `prettier --write "src/**/*.{ts,tsx,js,jsx,css}"` | Formatea `src/` con Prettier. |
+| `npm run format:check` | `prettier --check "src/**/*.{ts,tsx,js,jsx,css}"` | Verifica formato sin escribir. |
+
+## Estructura de carpetas
+
 ```
-
-## Estructura principal
-
-```text
 src/
-  components/    # MovieCard, MovieSearch, MovieCarousel, GenreChips, MyList, PublicList, Header, Footer, FilmIntro, AuthButton
-  contexts/       # ThemeContext, AuthContext
-  hooks/          # useTheme, useAuth, useMyList, useFirstListMovieId
-  providers/      # ThemeProvider, AuthProvider
-  services/       # movieApi.ts (cliente /api/*), firebase.ts
-  styles/         # global.css (paleta "Marquesina")
-  theme/          # antdTheme.ts
-  types/          # movies.ts
-  constants/      # genres.ts
+  assets/            react.svg, no-poster.svg, img/fondo.jpg
+  components/
+    AuthButton/
+    Footer/
+    FilmIntro/
+    GenreChips/
+    Header/
+    MovieCard/         MovieCard, MovieDetail, FavoriteButton
+    MovieCarousel/
+    MovieSearch/        MovieSearch, MovieRows
+    MyList/
+    PublicList/
+  constants/genres.ts
+  contexts/            ThemeContext, AuthContext
+  hooks/               useTheme, useAuth, useMyList, useFirstListMovieId
+  providers/           ThemeProvider, AuthProvider
+  services/            movieApi.ts, firebase.ts
+  styles/global.css
+  theme/antdTheme.ts
+  types/movies.ts
   main.tsx
 api/
-  search.ts       # proxy serverless a /search/movie
-  movies.ts       # proxy serverless multi-endpoint (trending, top_rated, upcoming, discover, credits, videos, recommendations)
+  search.ts
+  movies.ts
 firestore.rules
 ```
 
-## Demo
+## Subagentes de Claude Code
 
-[agregar URL de demo]
-
-## Sobre el desarrollo
-
-Parte del desarrollo de este proyecto se apoyo en una arquitectura de subagentes de Claude Code (diseño, implementacion, seguridad y QA), con verificacion visual real via Playwright en los pasos de UI y de QA final.
-
-## Documentacion relacionada
-
-- `CLAUDE.md` / `AGENTS.md`: contexto detallado del proyecto para agentes de codigo.
-- `INSTRUCCIONES_USO.md`: guia rapida de uso diario.
-
-El proyecto arranco en JavaScript y se migro a TypeScript + Ant Design en una etapa temprana (antes de Firebase, el proxy serverless y los carruseles); ese historico ya no vive en un archivo aparte.
+Este repo incluye configuraciones de subagentes (`.claude/agents/`) para
+trabajar con Claude Code: `ux-color-designer` (diseno y paletas),
+`frontend-implementer` (features y componentes), `security-auditor`
+(auditoria de seguridad), `qa-build-reviewer` (verificacion de build/lint/
+accesibilidad) y `orchestrator` (coordina a los demas).
 
 ## Troubleshooting
 
-- Si el puerto 5173 esta ocupado:
+- **Puerto ocupado**: si `5173` esta en uso, Vite ofrece automaticamente el
+  siguiente puerto libre.
+- **Falta `TMDB_API_TOKEN`**: `/api/search` y `/api/movies` responden `500`.
+  Verificar que la variable este en `.env.local` (o en el entorno de
+  Vercel) sin prefijo `VITE_`.
+- **`/api/*` no responde en desarrollo**: `npm run dev` solo sirve el
+  frontend con Vite. Usar `npx vercel dev` para levantar tambien las
+  funciones serverless.
+- **El login con Google no completa el redirect**: `signInWithRedirect`
+  requiere que el dominio este en la lista de *Authorized domains* de
+  Firebase Authentication, y que Firebase Hosting este inicializado en el
+  proyecto de Firebase para que el flujo de redirect complete
+  correctamente. Sin esto, `getRedirectResult` en `AuthProvider` no
+  resuelve la sesion al volver del redirect.
 
-```bash
-npm run dev -- --port 3000
-```
+## Licencia
 
-- Si falla la carga de peliculas, verifica que `TMDB_API_TOKEN` este configurado (en `.env.local` para `vercel dev`, o en las variables de entorno del proyecto en Vercel para produccion).
+[agregar LICENSE]
+
+## Autor
+
+[Tu nombre] — [tu LinkedIn] — [tu portfolio]
