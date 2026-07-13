@@ -1,11 +1,11 @@
 import React from 'react';
-import { Avatar, Button, Dropdown } from 'antd';
+import { Avatar, Button, Dropdown, message } from 'antd';
 import { GoogleOutlined } from '@ant-design/icons';
 import {
   GoogleAuthProvider,
   browserLocalPersistence,
   setPersistence,
-  signInWithRedirect,
+  signInWithPopup,
   signOut,
 } from 'firebase/auth';
 import { auth } from '../../services/firebase';
@@ -27,10 +27,19 @@ export const AuthButton: React.FC = () => {
         size="large"
         onClick={() =>
           setPersistence(auth, browserLocalPersistence)
-            .then(() => signInWithRedirect(auth, new GoogleAuthProvider()))
-            .catch((error) =>
-              console.error('Error al iniciar sesion con Google:', error)
-            )
+            .then(() => signInWithPopup(auth, new GoogleAuthProvider()))
+            .catch((error) => {
+              if (
+                error.code === 'auth/popup-blocked' ||
+                error.code === 'auth/popup-closed-by-user'
+              ) {
+                message.info(
+                  'El popup de inicio de sesion fue bloqueado o cerrado. Intenta de nuevo.'
+                );
+                return;
+              }
+              console.error('Error al iniciar sesion con Google:', error);
+            })
         }
       >
         <span className={styles.signInLabel}>Iniciar sesion con Google</span>
