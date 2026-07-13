@@ -21,8 +21,8 @@ createRoot(rootElement).render(
     <ThemeProvider>
       <AuthProvider>
         <FilmIntro />
-        <Header />
         <BrowserRouter>
+          <Header />
           <Routes>
             <Route path="/" element={<MovieSearch />} />
             <Route path="/mi-lista" element={<MyList />} />
