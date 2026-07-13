@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import handler from './movies';
+import handler from '../../api/movies';
 
 const TEST_TOKEN = 'test-secret-token-xyz';
 

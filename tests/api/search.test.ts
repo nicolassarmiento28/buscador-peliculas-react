@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import handler from './search';
+import handler from '../../api/search';
 
 const TEST_TOKEN = 'test-secret-token-xyz';
 
