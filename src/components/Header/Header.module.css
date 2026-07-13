@@ -19,6 +19,14 @@
   font-weight: 600;
   font-size: 15px;
   color: var(--text-main);
+  text-decoration: none;
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+.title:hover {
+  opacity: 0.8;
+  color: var(--text-main);
 }
 
 .rightGroup {

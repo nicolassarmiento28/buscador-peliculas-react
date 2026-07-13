@@ -13,7 +13,9 @@ export const Header: React.FC = () => {
 
   return (
     <header className={styles.header}>
-      <span className={styles.title}>Buscador de Películas</span>
+      <Link to="/" className={styles.title}>
+        Buscador de Películas
+      </Link>
       <div className={styles.rightGroup}>
         {user ? (
           <Link to="/mi-lista">

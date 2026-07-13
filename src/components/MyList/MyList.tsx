@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Row, Col, Switch, Input, Button, Typography, message } from 'antd';
-import { CheckOutlined, CopyOutlined, HeartOutlined } from '@ant-design/icons';
+import {
+  ArrowLeftOutlined,
+  CheckOutlined,
+  CopyOutlined,
+} from '@ant-design/icons';
 import { collection, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db } from '../../services/firebase';
 import { useAuth } from '../../hooks/useAuth';
 import { useMyList } from '../../hooks/useMyList';
 import { MovieCard } from '../MovieCard/MovieCard';
-import { AuthButton } from '../AuthButton/AuthButton';
 import type { Movie } from '../../types/movies';
 import styles from './MyList.module.css';
 
@@ -21,10 +24,17 @@ interface MyListItem {
 
 export const MyList: React.FC = () => {
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
   const { shareSlug, isFavorite, isSaving, toggleFavorite } = useMyList(user);
   const [items, setItems] = useState<MyListItem[]>([]);
   const [isPublic, setIsPublic] = useState(false);
   const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (loading || user) return;
+    message.info('Inicia sesion para ver tu lista');
+    navigate('/');
+  }, [user, loading, navigate]);
 
   useEffect(() => {
     if (!user) return;
@@ -74,20 +84,8 @@ export const MyList: React.FC = () => {
       .catch((error) => console.error('Error copiando el link:', error));
   };
 
-  if (loading) {
+  if (loading || !user) {
     return null;
-  }
-
-  if (!user) {
-    return (
-      <div className={styles.container}>
-        <div className={styles.emptyState}>
-          <HeartOutlined className={styles.emptyIcon} />
-          <p className={styles.emptyTitle}>Inicia sesion para ver tu lista</p>
-          <AuthButton />
-        </div>
-      </div>
-    );
   }
 
   const movies: Movie[] = items.map((item) => ({
@@ -99,6 +97,12 @@ export const MyList: React.FC = () => {
 
   return (
     <div className={styles.container}>
+      <Button
+        shape="circle"
+        icon={<ArrowLeftOutlined />}
+        aria-label="Volver a la pagina principal"
+        onClick={() => navigate('/')}
+      />
       <div className={styles.header}>
         <h1 className={styles.title}>Mi lista</h1>
         <Switch
