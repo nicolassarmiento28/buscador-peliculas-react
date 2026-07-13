@@ -1,0 +1,39 @@
+rules_version = '2';
+
+// Modelo de datos real (ver src/hooks/useMyList.ts, src/components/MyList/MyList.tsx,
+// src/components/PublicList/PublicList.tsx):
+//   lists/{listId}       - listId === uid del dueño (una lista por usuario)
+//     ownerId, title, isPublic, shareSlug, createdAt
+//   lists/{listId}/items/{itemId}
+//     movieId, movieTitle, posterPath, addedAt
+//
+// PublicList.tsx lee con un query: where('shareSlug','==',slug) AND
+// where('isPublic','==',true) sobre toda la coleccion lists, sin login.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /lists/{listId} {
+      // Orden importa: si el doc todavia no existe (primera visita del
+      // dueno, antes de la transaccion de creacion en useMyList.ts),
+      // resource es null y `resource.data.isPublic` lanza un error que
+      // Firestore trata como deny, sin llegar a evaluar el resto del ||.
+      // Se evalua primero la condicion del dueno (no toca `resource`).
+      allow read: if (request.auth != null && request.auth.uid == listId)
+                  || (resource != null && resource.data.isPublic == true);
+
+      allow create: if request.auth != null
+                    && request.auth.uid == listId
+                    && request.resource.data.ownerId == request.auth.uid;
+
+      allow update: if request.auth != null && request.auth.uid == listId;
+
+      allow delete: if false;
+
+      match /items/{itemId} {
+        allow read: if (request.auth != null && request.auth.uid == listId)
+                    || get(/databases/$(database)/documents/lists/$(listId)).data.isPublic == true;
+
+        allow write: if request.auth != null && request.auth.uid == listId;
+      }
+    }
+  }
+}
