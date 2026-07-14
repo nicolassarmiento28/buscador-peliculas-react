@@ -51,6 +51,8 @@ export const MovieCard: React.FC<MovieCardProps> = ({
               alt={movie.title}
               src={posterUrl}
               className={styles.moviePoster}
+              loading="lazy"
+              decoding="async"
             />
             {readOnly ? null : (
               <FavoriteButton
