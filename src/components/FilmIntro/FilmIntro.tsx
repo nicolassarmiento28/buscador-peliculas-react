@@ -53,10 +53,12 @@ export const FilmIntro: FC = () => {
         }
       }}
       onAnimationEnd={(event) => {
-        if (
-          event.animationName === 'film-fadeout' ||
-          event.animationName === 'film-fadeout-fast'
-        ) {
+        if (event.animationName === 'film-fadeout') {
+          setVisible(false);
+        }
+      }}
+      onTransitionEnd={(event) => {
+        if (event.propertyName === 'opacity') {
           setVisible(false);
         }
       }}

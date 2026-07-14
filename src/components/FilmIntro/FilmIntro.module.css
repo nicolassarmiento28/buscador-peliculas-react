@@ -41,7 +41,10 @@
 }
 
 .skipping {
-  animation: film-fadeout-fast 350ms ease-out forwards !important;
+  animation: none !important;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease-out;
 }
 
 .skipHint {
@@ -70,14 +73,5 @@
   }
   to {
     opacity: 0;
-  }
-}
-@keyframes film-fadeout-fast {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    visibility: hidden;
   }
 }
