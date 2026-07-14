@@ -66,11 +66,9 @@ body {
   font-family: 'Inter', sans-serif;
   color: var(--text-main);
   background-color: var(--bg-primary);
-  background-image: var(--bg-gradient), url('../assets/img/fondo.jpg');
-  background-size: auto, contain;
-  background-position:
-    center,
-    center top;
+  background-image: var(--bg-gradient);
+  background-size: auto;
+  background-position: center;
   background-repeat: no-repeat;
   background-attachment: scroll;
   transition:
@@ -90,12 +88,20 @@ body {
 }
 
 /* Fondo ambiente: parallax lento + grano de pelicula, sobre la base
-   --bg-gradient/--bg-primary/fondo.jpg ya definida arriba en body. */
+   --bg-gradient/--bg-primary ya definida arriba en body, con vineta radial
+   sutil (color-mix al 30% para no oscurecer demasiado los bordes). */
 body::before {
   content: '';
   position: fixed;
   inset: -10%;
-  background: var(--bg-gradient);
+  background:
+    var(--bg-gradient),
+    radial-gradient(
+      ellipse at center,
+      transparent 55%,
+      color-mix(in srgb, var(--accent-secondary) 30%, transparent) 100%
+    );
+  background-blend-mode: normal, multiply;
   animation: marquesina-drift var(--drift-duration, 60s) ease-in-out infinite
     alternate;
   z-index: -2;
