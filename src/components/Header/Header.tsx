@@ -12,7 +12,7 @@ export const Header: React.FC = () => {
   return (
     <header className={styles.header}>
       <Link to="/" className={styles.title}>
-        Buscador de Películas
+        CineList
       </Link>
       <div className={styles.rightGroup}>
         <Link to="/mi-lista">

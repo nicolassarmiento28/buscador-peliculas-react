@@ -93,7 +93,7 @@ export const MovieSearch: React.FC = () => {
       <div className={styles.header}>
         <Link to="/" className={styles.titleLink}>
           <Title level={1} className={styles.title}>
-            Buscador de Películas
+            CineList
           </Title>
         </Link>
         <span className={styles.subtitle}>Explora el catálogo de TMDb</span>
