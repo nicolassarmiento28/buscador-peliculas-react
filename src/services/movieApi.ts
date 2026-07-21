@@ -146,6 +146,36 @@ export const getMovieVideos = async (id: number): Promise<VideosResponse> => {
   }
 };
 
+export interface PublicListItem {
+  movieId: number;
+  movieTitle: string;
+  posterPath: string | null;
+}
+
+export interface PublicListResult {
+  title: string;
+  items: PublicListItem[];
+}
+
+export const getPublicList = async (
+  shareSlug: string
+): Promise<PublicListResult | null> => {
+  const response = await fetch(
+    `/api/public-list?shareSlug=${encodeURIComponent(shareSlug)}`
+  );
+
+  if (response.status === 404) {
+    return null;
+  }
+
+  if (!response.ok) {
+    const apiMessage = await readJsonErrorMessage(response);
+    throw new Error(`HTTP ${response.status}${apiMessage}`);
+  }
+
+  return await response.json();
+};
+
 export const getMovieRecommendations = async (
   id: number
 ): Promise<MovieSearchResult> => {

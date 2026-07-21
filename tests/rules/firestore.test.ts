@@ -4,7 +4,16 @@ import {
   assertFails,
   type RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { setDoc, getDoc, deleteDoc, doc } from 'firebase/firestore';
+import {
+  setDoc,
+  getDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  collection,
+  query,
+  where,
+} from 'firebase/firestore';
 import { readFileSync } from 'node:fs';
 import { beforeAll, afterAll, beforeEach, describe, it } from 'vitest';
 
@@ -91,6 +100,16 @@ describe('firestore.rules - lists/{listId}', () => {
   it('lectura publica denegada si el doc no existe (primera visita)', async () => {
     const ctxAnon = testEnv.unauthenticatedContext();
     await assertFails(getDoc(doc(ctxAnon.firestore(), 'lists', UID_A)));
+  });
+
+  it('nadie puede hacer un query/list sobre la coleccion lists (evita enumeracion de shareSlug)', async () => {
+    await seedList(true);
+    const ctxAnon = testEnv.unauthenticatedContext();
+    await assertFails(
+      getDocs(query(collection(ctxAnon.firestore(), 'lists'), where('isPublic', '==', true)))
+    );
+    const ctxA = testEnv.authenticatedContext(UID_A);
+    await assertFails(getDocs(collection(ctxA.firestore(), 'lists')));
   });
 
   it('el dueno autenticado puede crear su propia lista (doc aun no existe)', async () => {

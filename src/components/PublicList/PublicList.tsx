@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { Row, Col, Empty, Button } from 'antd';
-import { collection, getDocs, query, where } from 'firebase/firestore';
-import { db } from '../../services/firebase';
 import { MovieCard } from '../MovieCard/MovieCard';
 import { MovieCarousel } from '../MovieCarousel/MovieCarousel';
-import { getMovieRecommendations } from '../../services/movieApi';
+import {
+  getMovieRecommendations,
+  getPublicList,
+} from '../../services/movieApi';
 import type { Movie } from '../../types/movies';
 import styles from './PublicList.module.css';
 
@@ -33,40 +34,24 @@ export const PublicList: React.FC = () => {
 
     (async () => {
       try {
-        // Query por el campo shareSlug (el id de doc ahora es el uid del
-        // dueno, no el slug) filtrando isPublic para no exponer listas
-        // privadas ni depender de reglas de seguridad para ocultarlas.
-        const listSnap = await getDocs(
-          query(
-            collection(db, 'lists'),
-            where('shareSlug', '==', shareSlug),
-            where('isPublic', '==', true)
-          )
-        );
+        // Resuelto via api/public-list.ts (Firebase Admin SDK server-side):
+        // el cliente nunca hace un query directo sobre la coleccion lists,
+        // asi se evita poder enumerar shareSlugs de listas publicas en
+        // batch (ver firestore.rules, `allow list: if false`).
+        const list = await getPublicList(shareSlug);
         if (cancelled) return;
 
-        if (listSnap.empty) {
+        if (!list) {
           setState('unavailable');
           return;
         }
 
-        const listId = listSnap.docs[0].id;
-        const itemsSnap = await getDocs(
-          collection(db, 'lists', listId, 'items')
-        );
-        if (cancelled) return;
-
-        const listItems = itemsSnap.docs.map((docSnap) => ({
-          movieId: docSnap.data().movieId as number,
-          movieTitle: docSnap.data().movieTitle as string,
-          posterPath: (docSnap.data().posterPath ?? null) as string | null,
-        }));
-        setItems(listItems);
+        setItems(list.items);
         setState('ready');
 
-        if (listItems.length > 0) {
+        if (list.items.length > 0) {
           const { movies } = await getMovieRecommendations(
-            listItems[0].movieId
+            list.items[0].movieId
           );
           if (!cancelled) setRecommendations(movies);
         }

@@ -55,6 +55,17 @@ del cliente.
    - Probar manualmente (o via `firebase emulators:exec` con casos de
      test) que un usuario autenticado no puede leer ni escribir la
      lista privada de otro usuario
+   - **Filtros de query del cliente nunca son seguridad real**: si una
+     pantalla arma una query con un `where` (por ejemplo
+     `isPublic == true`), verificar que esa misma condicion este
+     garantizada DENTRO de la regla de Firestore, no solo en el codigo
+     del cliente. Un cliente malicioso puede armar cualquier query que
+     las reglas le permitan, ignorando por completo los `where` que
+     puso el desarrollador original. Antes de aprobar cualquier feature
+     que use queries compuestas (no lectura directa por ID), simular
+     una query que omita el filtro "seguro" y confirmar que Firestore
+     la rechaza por reglas, no que dependa de que el cliente siempre la
+     arme bien.
 9. **Entropia de identificadores publicos** (como `shareSlug`): un slug
    corto o predecible permite enumerar listas privadas ajenas por fuerza
    bruta si en algun momento se relaja la regla de "isPublic". Confirmar

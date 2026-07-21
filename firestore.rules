@@ -7,8 +7,14 @@ rules_version = '2';
 //   lists/{listId}/items/{itemId}
 //     movieId, movieTitle, posterPath, addedAt
 //
-// PublicList.tsx lee con un query: where('shareSlug','==',slug) AND
-// where('isPublic','==',true) sobre toda la coleccion lists, sin login.
+// La lectura publica de /lista/:shareSlug pasa por api/public-list.ts
+// (Firebase Admin SDK, que no esta sujeto a estas reglas). Las reglas de
+// abajo son la ultima linea de defensa si alguien pega directo a Firestore
+// desde el cliente con el SDK web, y por eso solo permiten `get` (un doc
+// puntual por id conocido), nunca `list`/query de coleccion: una query
+// tipo where('isPublic','==',true) sin shareSlug enumeraria en batch los
+// shareSlugs de todas las listas publicas, aunque cada doc individual ya
+// este protegido.
 service cloud.firestore {
   match /databases/{database}/documents {
     match /lists/{listId} {
@@ -17,8 +23,10 @@ service cloud.firestore {
       // resource es null y `resource.data.isPublic` lanza un error que
       // Firestore trata como deny, sin llegar a evaluar el resto del ||.
       // Se evalua primero la condicion del dueno (no toca `resource`).
-      allow read: if (request.auth != null && request.auth.uid == listId)
-                  || (resource != null && resource.data.isPublic == true);
+      allow get: if (request.auth != null && request.auth.uid == listId)
+                 || (resource != null && resource.data.isPublic == true);
+
+      allow list: if false;
 
       allow create: if request.auth != null
                     && request.auth.uid == listId
@@ -29,8 +37,10 @@ service cloud.firestore {
       allow delete: if false;
 
       match /items/{itemId} {
-        allow read: if (request.auth != null && request.auth.uid == listId)
-                    || get(/databases/$(database)/documents/lists/$(listId)).data.isPublic == true;
+        allow get: if (request.auth != null && request.auth.uid == listId)
+                   || get(/databases/$(database)/documents/lists/$(listId)).data.isPublic == true;
+
+        allow list: if false;
 
         allow write: if request.auth != null && request.auth.uid == listId;
       }
