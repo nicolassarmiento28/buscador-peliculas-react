@@ -282,32 +282,3 @@ trabajar con Claude Code:
 | `qa-build-reviewer` | Verificacion final (build/lint/accesibilidad/responsive), siempre al final. |
 | `orchestrator` | Coordina a los anteriores para tareas multi-capa. |
 
-## Troubleshooting
-
-- **El login con Google no abre o no completa**: el proyecto tuvo un bug
-  real de esto (ver commits `c92a95e` "Fix Google login popup being blocked
-  on mobile browsers" y `303a2c3` "Revert Google login from redirect back to
-  popup" en el historial de git). Se probo migrar a `signInWithRedirect`,
-  pero ese flujo tenia problemas propios y se revirtio a
-  `signInWithPopup`. El fix real para el bloqueo de popups en movil fue
-  manejar explicitamente los codigos de error `auth/popup-blocked` y
-  `auth/popup-closed-by-user` en `AuthButton.tsx`, mostrando un mensaje
-  in-app en vez de fallar silenciosamente. Ademas, requiere que el dominio
-  este en *Authorized domains* de Firebase Authentication > Settings, y que
-  el popup se dispare por un gesto directo del usuario (el click del
-  boton), no de forma programatica despues.
-- **Falta `TMDB_API_TOKEN`**: `/api/search` y `/api/movies` responden `500`.
-  Verificar la variable en `.env.local` o en el entorno de Vercel, sin
-  prefijo `VITE_`.
-- **Faltan las variables `FIREBASE_ADMIN_*`**: `/api/public-list` responde
-  `500` si falta cualquiera de `FIREBASE_ADMIN_PROJECT_ID`,
-  `FIREBASE_ADMIN_CLIENT_EMAIL`, `FIREBASE_ADMIN_PRIVATE_KEY`. Se generan en
-  Firebase Console > Configuracion del proyecto > Cuentas de servicio >
-  Generar nueva clave privada. Cuidado con `FIREBASE_ADMIN_PRIVATE_KEY`: en
-  `.env.local` va con `\n` literales entre comillas, y el codigo hace
-  `.replace(/\\n/g, '\n')` para des-escaparlos.
-- **`/api/*` no responde en desarrollo**: `npm run dev` solo levanta Vite
-  (frontend). Usar `npx vercel dev` para tambien correr las funciones
-  serverless, o probar en preview deploys de Vercel.
-- **Puerto ocupado**: si `5173` esta en uso, Vite ofrece automaticamente el
-  siguiente puerto libre.
