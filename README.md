@@ -1,10 +1,12 @@
-# Buscador de Peliculas
+# Marquesina
+
+### Buscador de Peliculas
 
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-7-646CFF?logo=vite&logoColor=white)
-![Ant Design](https://img.shields.io/badge/Ant%20Design-6-0170FE?logo=antdesign&logoColor=white)
 ![Firebase](https://img.shields.io/badge/Firebase-12-FFCA28?logo=firebase&logoColor=black)
+![Vercel](https://img.shields.io/badge/Vercel-Deploy-000000?logo=vercel&logoColor=white)
 
 Aplicacion web para descubrir y buscar peliculas usando la API de TMDb (The
 Movie Database). Permite explorar tendencias y catalogo por genero, guardar
@@ -13,6 +15,29 @@ autenticacion via Google y una interfaz clara/oscura con identidad visual
 propia ("Marquesina").
 
 Demo: [agregar URL de demo]
+
+![Home modo oscuro](docs/screenshots/home-dark.png)
+
+![Home modo claro](docs/screenshots/home-light.png)
+
+> **Nota sobre capturas**: las capturas en `docs/screenshots/` (`home-dark.png`,
+> `home-light.png`, `mi-lista.png`) son del entorno LOCAL de desarrollo
+> (`npm run dev`), no de produccion. La unica URL de convencion probada
+> (`https://buscador-peliculas-react.vercel.app`) responde, pero sirve una
+> UI generica que no corresponde a este codigo base (sin la paleta
+> Marquesina, sin Header/Footer/FilmIntro), probablemente un deployment
+> viejo o distinto con el mismo nombre de proyecto en Vercel; por eso no se
+> pudo confirmar la URL real vigente. Ademas, `vite` en local no ejecuta las
+> funciones serverless de `api/` (requieren `vercel dev`, que en esta maquina
+> falla por un conflicto entre el rewrite catch-all de `vercel.json` y el
+> middleware de import-analysis de Vite), asi que los carruseles de
+> tendencias/genero salen vacios en las capturas de home. `detalle-modal.png`
+> quedo pendiente por el mismo motivo (sin datos de TMDb no hay tarjetas para
+> abrir). `lista-publica.png` tambien quedo pendiente: aunque se encontro un
+> `shareSlug` real de una lista existente en Firestore, la vista publica
+> respondio "Esta lista no esta disponible" en el entorno local. Actualizar
+> esta seccion con capturas reales una vez confirmada la URL de produccion
+> vigente.
 
 ## Caracteristicas
 
@@ -26,6 +51,8 @@ Demo: [agregar URL de demo]
 - **Lista personal** (`/mi-lista`, requiere sesion) guardable y **compartible
   publicamente** en `/lista/:shareSlug`, con recomendaciones basadas en la
   primera pelicula de la lista. La lectura publica no requiere login.
+
+![Mi lista](docs/screenshots/mi-lista.png)
 - **Tema claro/oscuro** persistido en `localStorage`.
 - Interfaz responsiva construida con Ant Design 6.
 
@@ -195,4 +222,7 @@ accesibilidad) y `orchestrator` (coordina a los demas).
 
 ## Autor
 
-[Tu nombre] — [tu LinkedIn] — [tu portfolio]
+- Nombre: [TU NOMBRE]
+- Contacto: [tu-email@ejemplo.com]
+- GitHub: [link]
+- LinkedIn: [link]
