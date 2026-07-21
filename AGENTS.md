@@ -20,9 +20,9 @@ npm run lint          # ESLint
 npm run preview       # Sirve el build de produccion
 npm run format        # Prettier sobre src/
 npm run format:check  # Verifica formato sin escribir
+npm run test          # vitest run
+npm run test:rules    # Tests de firestore.rules (@firebase/rules-unit-testing). Requiere el emulador de Firestore: corre via `firebase emulators:exec --only firestore "vitest run --config vitest.rules.config.ts"`
 ```
-
-No hay script `test`.
 
 ## Estructura
 
@@ -65,6 +65,7 @@ src/
 api/
   search.ts             # Proxy serverless a /search/movie
   movies.ts             # Proxy serverless multi-endpoint (trending/top_rated/upcoming/discover/credits/videos/recommendations)
+  public-list.ts        # Proxy serverless via Firebase Admin SDK: resuelve shareSlug -> lista publica puntual
 firestore.rules
 ```
 
@@ -94,18 +95,19 @@ Node runtime, sin `@vercel/node` instalado (tipos de `req`/`res` como `any`).
   - `upcoming` -> `movie/{type}`
   - `discover` -> requiere `genre_id` + `sort_by` validado contra whitelist (`popularity.desc`, `vote_average.desc`, `primary_release_date.desc`)
   - `credits` / `videos` / `recommendations` -> requieren `id` de pelicula
+- `api/public-list.ts`: dado un `shareSlug`, usa Firebase Admin SDK (no el SDK cliente, no sujeto a `firestore.rules`) para resolver la lista publica puntual sin exponer al cliente una query de coleccion completa sobre `lists`. Valida `shareSlug` con regex (`/^[a-zA-Z0-9_-]{4,64}$/`) y filtra `isPublic == true` en el propio codigo antes de responder. Devuelve 400 si el slug es invalido, 404 si no encuentra una lista publica con ese slug, 500 si faltan las credenciales de Admin SDK (`FIREBASE_ADMIN_*`), 502 si falla la lectura a Firestore. `src/components/PublicList/PublicList.tsx` lo consume via `getPublicList()` en `src/services/movieApi.ts`, nunca lee Firestore directo desde el cliente.
 
-El token `TMDB_API_TOKEN` es SOLO server-side (nunca con prefijo `VITE_`, nunca llega al bundle cliente). Ambos endpoints devuelven 500 si falta el token, 400 si los parametros son invalidos, 502 si falla el fetch a TMDb.
+El token `TMDB_API_TOKEN` es SOLO server-side (nunca con prefijo `VITE_`, nunca llega al bundle cliente). Los tres endpoints devuelven 500 si falta el token, 400 si los parametros son invalidos, 502 si falla el fetch a TMDb.
 
 ## Firebase / Firestore
 
-- **Auth**: Google via `signInWithRedirect` (NO popup). `AuthProvider` tiene una unica suscripcion centralizada a `onAuthStateChanged` + resuelve `getRedirectResult` al montar; expone `{ user, loading }` via `AuthContext`/`useAuth`.
+- **Auth**: Google via `signInWithPopup` (NO redirect). Se uso popup en vez de redirect porque la particion de almacenamiento de terceros (third-party storage partitioning) de los navegadores modernos rompe el flujo de `signInWithRedirect` en apps que no estan alojadas en Firebase Hosting: el resultado del redirect no puede leerse de vuelta por el aislamiento de storage entre dominios. `AuthProvider` tiene una unica suscripcion centralizada a `onAuthStateChanged`; expone `{ user, loading }` via `AuthContext`/`useAuth`. `AuthButton` maneja errores de popup bloqueado/cerrado (`auth/popup-blocked`, `auth/popup-closed-by-user`) con un mensaje al usuario en vez de fallar en silencio.
 - **Modelo de datos real**: coleccion `lists/{listId}` donde `listId` = uid del dueño (una lista por usuario, resuelta/creada via transaccion en `useMyList.ts` con `runTransaction` para evitar duplicados en carreras).
   - Campos del doc: `ownerId, title, isPublic, shareSlug, createdAt`.
   - `shareSlug` es un CAMPO (generado con `crypto.randomUUID().slice(0, 8)`), NO es el id del documento.
   - Subcoleccion `lists/{listId}/items/{itemId}` con campos `movieId, movieTitle, posterPath, addedAt`.
-- `PublicList.tsx` lee la lista compartida con un QUERY (`where('shareSlug', '==', slug) AND where('isPublic', '==', true)`) sobre toda la coleccion `lists`, sin login, sin depender del id de doc.
-- `firestore.rules`: el dueño (`auth.uid == listId`) puede leer/crear/actualizar su propio doc pero NUNCA borrarlo (`allow delete: if false`); lectura publica si `isPublic == true`. El orden de las condiciones en `allow read` importa: se evalua primero la del dueño porque no toca `resource`, evitando error en la primera visita cuando el doc aun no existe. La subcoleccion `items` usa el mismo esquema, delegando la lectura publica en el doc padre via `get()`.
+- `PublicList.tsx` NO lee Firestore directo: llama a `getPublicList(shareSlug)` (`src/services/movieApi.ts`), que pega a `api/public-list.ts`. Ese endpoint (Firebase Admin SDK, fuera del alcance de `firestore.rules`) resuelve el `shareSlug` puntualmente sin exponer al cliente un query de coleccion completa sobre `lists`.
+- `firestore.rules`: el dueño (`auth.uid == listId`) puede hacer `get`/`create`/`update` sobre su propio doc pero NUNCA borrarlo (`allow delete: if false`); lectura publica (`get`) si `isPublic == true`. El orden de las condiciones en `allow get` importa: se evalua primero la del dueño porque no toca `resource`, evitando error en la primera visita cuando el doc aun no existe. La subcoleccion `items` usa el mismo esquema, delegando la lectura publica en el doc padre via `get()`. Tanto `lists` como `items` tienen `allow list: if false` explicito: cierra la enumeracion por query de coleccion (aunque cada doc individual este protegido, un `where('isPublic','==',true)` sin slug conocido podria listar en batch todos los shareSlugs publicos), como ultima linea de defensa incluso si alguien bypasea `api/public-list.ts` y pega directo a Firestore con el SDK cliente.
 
 ## Componentes clave (estado real actual)
 
@@ -157,7 +159,8 @@ Fuentes: `Playfair Display` (`--font-display`, titulos) + `Inter` (body). Fondo 
 
 Ver `.env.example`:
 
-- `TMDB_API_TOKEN` (SIN prefijo `VITE_` - solo server-side, usado por `api/`).
+- `TMDB_API_TOKEN` (SIN prefijo `VITE_` - solo server-side, usado por `api/search.ts` y `api/movies.ts`).
+- `FIREBASE_ADMIN_PROJECT_ID`, `FIREBASE_ADMIN_CLIENT_EMAIL`, `FIREBASE_ADMIN_PRIVATE_KEY` (credenciales de Firebase Admin SDK, SIN prefijo `VITE_` - solo server-side, usadas por `api/public-list.ts`; se generan en Firebase Console > Configuracion del proyecto > Cuentas de servicio > Generar nueva clave privada).
 - `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_AUTH_DOMAIN`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_STORAGE_BUCKET`, `VITE_FIREBASE_MESSAGING_SENDER_ID`, `VITE_FIREBASE_APP_ID` (config publica de Firebase, expuesta al cliente por diseño).
 
 ## Subagentes disponibles (.claude/agents/*.md)
