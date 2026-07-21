@@ -311,14 +311,3 @@ trabajar con Claude Code:
   serverless, o probar en preview deploys de Vercel.
 - **Puerto ocupado**: si `5173` esta en uso, Vite ofrece automaticamente el
   siguiente puerto libre.
-
-## Licencia
-
-MIT
-
-## Autor
-
-- Nombre: [TU NOMBRE]
-- Contacto: [tu-email@ejemplo.com]
-- GitHub: [link]
-- LinkedIn: [link]
